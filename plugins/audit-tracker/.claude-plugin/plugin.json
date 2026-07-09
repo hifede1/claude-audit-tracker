@@ -1,7 +1,7 @@
 {
   "name": "audit-tracker",
-  "description": "Auditoría del estado REAL de construcción de un proyecto + tracker vivo interactivo (artifact) con fichas de trabajo, plan de sesiones, mapa de flujo, registro de decisiones y ciclo de re-auditoría.",
-  "version": "1.0.0",
+  "description": "Auditoría del estado REAL de construcción de un proyecto + tracker vivo interactivo (artifact) con fichas de trabajo, plan de sesiones, mapa de flujo, registro de decisiones, ciclo de re-auditoría y modo despacho multi-máquina vía GitHub Issues.",
+  "version": "1.1.0",
   "author": {
     "name": "Federico Pernice"
   },
