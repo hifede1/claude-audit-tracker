@@ -11,12 +11,12 @@ Dos comandos para gestionar el estado real de un proyecto y repartir el trabajo 
 2. **Construye un tracker vivo** (artifact HTML autocontenido, commiteado al repo) con cinco pestañas: tablero con fichas de trabajo y encargos copiables, plan de sesiones ordenado por dependencias, mapa de flujo end-to-end, stack por capas, y registro de decisiones tipo ADR.
 3. **Ciclo de re-auditoría**: los cierres se marcan en ámbar (sin verificar) y solo pasan a verde cuando una re-auditoría los confirma EN CÓDIGO. El tracker se redeploya siempre a la misma URL.
 
-## Trabajo multi-máquina (modo despacho)
+## Trabajo en equipo (modo despacho)
 
 El tracker es un **mapa**, no un despachador (es un artifact con CSP estricta: sin backend, ticks en localStorage). La asignación de tareas vive en **GitHub Issues**:
 
-1. En la **máquina despachadora**, `/audit-tracker` en modo despacho publica cada sesión del plan como un issue: título `[S<NN>] <objetivo>`, cuerpo = la ficha completa, labels `encargo` + `sesion-NN` + `maquina/<nombre>`. Asignar una tarea a una máquina = ponerle su label.
-2. En cada **máquina trabajadora**, se corre `/proximo-encargo` desde el repo del proyecto: identifica la máquina (argumento o `~/.claude/machine-label`), busca su siguiente issue abierto respetando dependencias, lo reclama con un comentario (evita pisadas), lo ejecuta en una rama y abre PR con `Closes #NN`.
+1. En la **máquina despachadora**, `/audit-tracker` en modo despacho publica cada sesión del plan como un issue: título `[S<NN>] <objetivo>`, cuerpo = la ficha completa, labels `encargo` + `sesion-NN`. Asignar = poner a la persona como *assignee* del issue (los colaboradores deben estar invitados al repo); las etiquetas `maquina/<nombre>` quedan para máquinas sin persona fija.
+2. Cada **colaborador**, desde su máquina y dentro del repo del proyecto, corre `/proximo-encargo`: busca el siguiente issue abierto asignado a él (`--assignee @me`) respetando dependencias, lo reclama con un comentario (evita pisadas), lo ejecuta en una rama y abre PR con `Closes #NN`.
 3. La **re-auditoría** en la despachadora cierra el ciclo: issue cerrado ≠ hecho — se verifica en código, y recién ahí el tracker pasa el ítem a verde.
 
 ## Instalación
