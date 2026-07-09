@@ -1,0 +1,11 @@
+{
+  "name": "audit-tracker",
+  "description": "Auditoría del estado REAL de construcción de un proyecto + tracker vivo interactivo (artifact) con fichas de trabajo, plan de sesiones, mapa de flujo, registro de decisiones y ciclo de re-auditoría.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Federico Pernice"
+  },
+  "repository": "https://github.com/hifede1/claude-audit-tracker",
+  "license": "MIT",
+  "keywords": ["audit", "tracker", "project-management", "claude-code"]
+}

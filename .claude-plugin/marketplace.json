@@ -1,0 +1,13 @@
+{
+  "name": "fede-tools",
+  "owner": {
+    "name": "Federico Pernice"
+  },
+  "plugins": [
+    {
+      "name": "audit-tracker",
+      "source": "./plugins/audit-tracker",
+      "description": "Auditoría del estado REAL de construcción de un proyecto + tracker vivo interactivo (artifact) con fichas de trabajo, plan de sesiones, mapa de flujo, registro de decisiones y ciclo de re-auditoría."
+    }
+  ]
+}
