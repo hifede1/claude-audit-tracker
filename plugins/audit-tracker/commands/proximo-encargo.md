@@ -1,6 +1,6 @@
 # /proximo-encargo — Tomar y ejecutar el siguiente encargo asignado a esta máquina
 
-Sos el ejecutor de encargos del proyecto. Trabajás contra la cola de GitHub Issues generada por `/audit-tracker` en modo despacho (issues con label `encargo`). Este comando se corre DESDE el repo del proyecto.
+Sos el ejecutor de encargos del proyecto. Trabajás contra la cola de GitHub Issues generada por `/audit-tracker` en modo despacho (issues con label `encargo`). Este comando se corre DESDE el repo del proyecto. La cola puede compartirse con el orquestador de `/orquestar`: sus reclamos 🔒 valen igual que los de cualquier otra máquina.
 
 Etiqueta de máquina indicada por el usuario (si la hay): $ARGUMENTS
 
@@ -12,7 +12,7 @@ Etiqueta de máquina indicada por el usuario (si la hay): $ARGUMENTS
 4. **Reclamalo.** Comentá en el issue: `🔒 Tomado por <máquina> — <fecha>`. Si ya existe un reclamo de OTRA máquina sin PR mergeado ni desistimiento, ese encargo está ocupado: pasá al siguiente de la cola. (Esto evita que dos máquinas trabajen lo mismo.)
 5. **Leé las referencias ANTES de escribir código.** Si la ficha lista 📚 referencias (`docs/references/`, `docs/business/`), leelas primero: definen cómo se hace bien esta clase de feature. Si el encargo es territorio nuevo (proveedor externo, patrón que el repo no usa aún) y NO hay referencia, **generala primero**: investigación en fuentes oficiales, destilada en `docs/references/<tema>.md` (patrones, tradeoffs, citas, fecha) y commiteada en la misma rama — el próximo que toque el tema no arranca de cero. Si una referencia existente contradice lo que ves en las fuentes actuales, marcala como desactualizada en el issue: no construyas sobre referencia vencida.
 6. **Ejecutá el encargo.** El cuerpo del issue ES la ficha de trabajo: planteamiento, método paso a paso y criterios de cierre. Rama nueva desde la default actualizada (`git pull` primero; nombre `s<NN>-<slug>`), NUNCA directo a la rama default. Si la ficha trae badge de metodología (p.ej. SDD completo/ligero/directo), arrancá con ese tratamiento.
-7. **Criterio de HECHO — los tres o no está hecho**: funciona de punta a punta (flujo real, no camino feliz) + resiste errores y casos borde + verificado con los gates reales (typecheck, tests, lint).
+7. **Criterio de HECHO — los tres o no está hecho**: funciona de punta a punta (flujo real, no camino feliz) + resiste errores y casos borde + verificado con los gates reales (typecheck, tests, lint). Si un criterio de cierre es clavable por test y no lo está, escribí el test o dejá la **deuda de verificación** explícita como comentario en el issue — la re-auditoría la incorpora a la pestaña Tests del tracker.
 8. **Cerrá el ciclo.** Abrí PR que referencie el issue (`Closes #NN`) con resumen de qué se verificó y cómo. NO cierres el issue a mano: se cierra al mergear el PR, y el verde definitivo lo da la re-auditoría del tracker en la máquina despachadora.
 9. **Reportá.** Número de issue, rama, PR, qué quedó verificado, qué quedó pendiente y si se descubrió algo que el despachador deba saber.
 
