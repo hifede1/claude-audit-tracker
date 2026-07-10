@@ -26,10 +26,10 @@ Con `/orquestar`, el ciclo completo lo corre el orquestador y el humano queda so
 
 1. El orquestador toma el siguiente encargo desbloqueado de la cola de issues (respeta dependencias y los reclamos de otras máquinas — coexiste con `/proximo-encargo`).
 2. Lo ejecuta en una rama y, antes de pedir nada, **verifica su propio trabajo en código**: recorre los ✅ criterios de cierre de la ficha uno por uno y comenta en el PR un informe con evidencia `file:line` + gates. La ficha es el contrato de validación.
-3. Te asigna como reviewer. **Aprobar el PR = validar**: recién ahí mergea, re-audita y el tracker pasa el ítem a verde. Cambios pedidos = hallazgos (corrige y re-pide review; tras 2 rondas rechazadas escala en vez de insistir). El orquestador **jamás mergea sin tu firma** — el silencio no es aprobación.
-4. Mientras un PR espera firma puede arrancar el siguiente encargo independiente (máximo 3 PRs en cola de validación, para no inundarte).
+3. Te pide la **firma en el PR**: review aprobado si orquestador y validador usan cuentas de GitHub distintas, o un comentario tuyo `✅ validado` si comparten cuenta (GitHub no permite aprobar el propio PR). Recién con tu firma y el CI verde mergea, re-audita y el tracker pasa el ítem a verde. Cambios pedidos = hallazgos (corrige y re-pide firma; tras 2 rondas rechazadas escala ese encargo y sigue con los demás). Cerrar el PR sin mergear = veto: libera el encargo y no lo re-toma sin re-priorización humana. El orquestador **jamás mergea sin tu firma ni con CI rojo** — el silencio no es aprobación.
+4. Mientras un PR espera firma puede arrancar el siguiente encargo independiente (máximo 3 PRs en cola de validación, para no inundarte), y al (re)arrancar reconcilia primero los PRs de corridas anteriores: los firmados se mergean, los vetados se liberan.
 
-En este modo la semántica de colores del tracker se invierte: **ámbar** = verificado por la máquina, esperando tu firma; **verde** = validado y mergeado.
+La cola de validación vive en GitHub, no en ticks del tracker: el equivalente del ámbar es el **PR esperando tu firma** (verificado por la máquina, sin validar); al mergear, el tracker pasa el ítem directo a **verde**. El PR que actualiza el propio tracker es bookkeeping de un cierre ya firmado y el orquestador lo automergea.
 
 ## Instalación
 
@@ -66,7 +66,7 @@ curl -fsSL https://raw.githubusercontent.com/hifede1/claude-audit-tracker/main/p
 /orquestar [límite de iteraciones o sesión concreta]       # loop autónomo en la despachadora
 ```
 
-`/audit-tracker` arranca con una fase de calibración (unidad de estimación, actores/máquinas, metodología, modo de ejecución del loop); si hay varias máquinas, activa el modo despacho. `/orquestar` requiere el modo despacho activo: los issues son la cola que consume. Si un comando entra en conflicto con otro del mismo nombre, invocalo con namespace: `/audit-tracker:audit-tracker`.
+`/audit-tracker` arranca con una fase de calibración (unidad de estimación, actores/máquinas, metodología, modo de ejecución del loop); si hay varias máquinas — o se elige el modo orquestado, aunque haya una sola — activa el modo despacho: los issues son la cola que `/orquestar` consume. Si un comando entra en conflicto con otro del mismo nombre, invocalo con namespace: `/audit-tracker:audit-tracker`.
 
 ## Licencia
 
