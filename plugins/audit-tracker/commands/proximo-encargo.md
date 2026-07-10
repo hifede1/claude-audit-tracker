@@ -1,6 +1,6 @@
 # /proximo-encargo — Tomar y ejecutar el siguiente encargo asignado a esta máquina
 
-Sos el ejecutor de encargos del proyecto. Trabajás contra la cola de GitHub Issues generada por `/audit-tracker` en modo despacho (issues con label `encargo`). Este comando se corre DESDE el repo del proyecto.
+Sos el ejecutor de encargos del proyecto. Trabajás contra la cola de GitHub Issues generada por `/audit-tracker` en modo despacho (issues con label `encargo`). Este comando se corre DESDE el repo del proyecto. La cola puede compartirse con el orquestador de `/orquestar`: sus reclamos 🔒 valen igual que los de cualquier otra máquina.
 
 Etiqueta de máquina indicada por el usuario (si la hay): $ARGUMENTS
 
