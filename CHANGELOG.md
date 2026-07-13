@@ -2,6 +2,9 @@
 
 Formato: una entrada por versión del plugin. El detalle fino vive en los mensajes de commit.
 
+## v1.8.1 — 2026-07-13
+- **Fallback de calibración**: la Fase 0 jamás bloquea — si AskUserQuestion falla o no está disponible, se declaran defaults en texto (con su porqué), rigen hasta corrección del usuario y quedan visibles como calibración vigente en el tracker. Hallazgo en vivo de la primera corrida real (S03, issue #6).
+
 ## v1.8.0 — 2026-07-13
 - **Triggers en referencias** (estilo microagents de OpenHands): frontmatter `triggers: [...]` en `docs/references/`; los ejecutores barren por trigger además del link explícito de la ficha.
 - **Freno anti-loop** (stuck detection): mismo error tres veces o gate que no pasa tras varios intentos = parar, comentar hipótesis y escalar o desistir. *Trabado que insiste ≠ progreso.*
