@@ -1,0 +1,475 @@
+<!--
+  TRACKER VIVO — claude-audit-tracker (dogfooding: la herramienta auditándose a sí misma)
+  URL del artifact: https://claude.ai/code/artifact/fd9b5145-b109-4a6d-9cd7-f586fcf4d00b
+  PROTOCOLO DE ACTUALIZACIÓN (para cualquier sesión futura):
+  1. Los datos viven en las constantes JS del <script> (LAST_AUDIT, DATA, DEBT, EST, PLAN,
+     CHANGELOG, CLOSED_COUNT, DECISIONS, DECISION_PENDS, TESTS, REFS). La lógica de render
+     NO se toca en actualizaciones normales.
+  2. Ticks en localStorage con IDs ESTABLES (jamás renombrar ids). Ámbar = marcado sin
+     verificar; verde = solo vía re-auditoría (borrar de DATA y sumar a CLOSED_COUNT).
+  3. Re-auditoría: verificar EN CÓDIGO los ámbar, borrar confirmados de DATA/DEBT/EST/PLAN,
+     CLOSED_COUNT += n, entrada fechada en CHANGELOG, actualizar TESTS/REFS/mapa/stack,
+     node --check al JS, redeploy A LA MISMA URL (parámetro url del tool Artifact), commit
+     en rama + PR (en modo orquestado el PR del tracker es bookkeeping: automerge).
+  4. Calibración vigente: unidad=sesiones (~2-4h) · actores=fede(hifede1)+Claude, misma
+     cuenta GitHub (firma = comentario "✅ validado" en el PR) · metodología=directa ·
+     modo=orquestado (despacho activo: issues [SNN] con labels encargo+sesion-NN).
+-->
+<title>audit-tracker — tracker vivo</title>
+<style>
+  :root{
+    --bg:#faf8f3; --card:#ffffff; --ink:#28231a; --mut:#6f6759; --line:#e4ddcf;
+    --acc:#57508f; --acc-ink:#ffffff;
+    --amb:#b57f16; --amb-bg:#f7ecd4; --grn:#3d7d4c; --grn-bg:#e2efe2;
+    --red:#a8482e; --red-bg:#f6e3dc; --gry:#8a8172; --gry-bg:#eeeae0;
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){:root{
+    --bg:#1b1915; --card:#242119; --ink:#e9e3d4; --mut:#a39a86; --line:#3a3527;
+    --acc:#a79ee6; --acc-ink:#191527;
+    --amb:#d9a53c; --amb-bg:#3a2f14; --grn:#7cba85; --grn-bg:#1f3322;
+    --red:#d97e5f; --red-bg:#3c211a; --gry:#958c79; --gry-bg:#2d2a20;
+  }}
+  :root[data-theme="light"]{
+    --bg:#faf8f3; --card:#ffffff; --ink:#28231a; --mut:#6f6759; --line:#e4ddcf;
+    --acc:#57508f; --acc-ink:#ffffff;
+    --amb:#b57f16; --amb-bg:#f7ecd4; --grn:#3d7d4c; --grn-bg:#e2efe2;
+    --red:#a8482e; --red-bg:#f6e3dc; --gry:#8a8172; --gry-bg:#eeeae0;
+  }
+  :root[data-theme="dark"]{
+    --bg:#1b1915; --card:#242119; --ink:#e9e3d4; --mut:#a39a86; --line:#3a3527;
+    --acc:#a79ee6; --acc-ink:#191527;
+    --amb:#d9a53c; --amb-bg:#3a2f14; --grn:#7cba85; --grn-bg:#1f3322;
+    --red:#d97e5f; --red-bg:#3c211a; --gry:#958c79; --gry-bg:#2d2a20;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font:15px/1.55 "Avenir Next","Segoe UI",system-ui,sans-serif;margin:0;padding:0 16px 64px}
+  .wrap{max-width:1060px;margin:0 auto}
+  header.top{padding:28px 0 14px}
+  h1{font-size:22px;font-weight:650;letter-spacing:-.01em;margin:0}
+  .sub{color:var(--mut);font-size:13.5px;margin-top:4px}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .meta .m{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:7px 12px;font-size:12.5px}
+  .meta .m b{display:block;font-size:15px;font-variant-numeric:tabular-nums}
+  nav.tabs{display:flex;gap:2px;flex-wrap:wrap;border-bottom:2px solid var(--line);margin:18px 0 22px;position:sticky;top:0;background:var(--bg);z-index:5;padding-top:6px}
+  nav.tabs a{padding:8px 13px;text-decoration:none;color:var(--mut);font-size:13.5px;font-weight:600;border-bottom:2px solid transparent;margin-bottom:-2px}
+  nav.tabs a.on{color:var(--acc);border-bottom-color:var(--acc)}
+  nav.tabs a:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+  section.tab{display:none}section.tab.on{display:block}
+  h2{font-size:16px;font-weight:650;margin:26px 0 10px}
+  .note{color:var(--mut);font-size:13px;margin:6px 0 14px}
+  .card{background:var(--card);border:1px solid var(--line);border-left-width:4px;border-radius:6px;padding:14px 16px;margin:0 0 12px}
+  .card.curso{border-left-color:var(--amb)} .card.pend{border-left-color:var(--gry)}
+  .card.maqueta{border-left-color:var(--red)} .card.hecho{border-left-color:var(--grn)}
+  .bh{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .bh h3{font-size:15px;margin:0;font-weight:650}
+  .pill{font-size:11px;font-weight:700;letter-spacing:.04em;padding:2px 9px;border-radius:99px}
+  .p-curso{background:var(--amb-bg);color:var(--amb)} .p-pend{background:var(--gry-bg);color:var(--gry)}
+  .p-maqueta{background:var(--red-bg);color:var(--red)} .p-hecho{background:var(--grn-bg);color:var(--grn)}
+  .p-amb{background:var(--amb-bg);color:var(--amb)} .p-grn{background:var(--grn-bg);color:var(--grn)}
+  .p-red{background:var(--red-bg);color:var(--red)}
+  .kv{font-size:13.5px;margin:8px 0 0}.kv b{font-weight:650}
+  .ev{font-family:var(--mono);font-size:12px;color:var(--mut)}
+  details{margin-top:10px}summary{cursor:pointer;font-weight:600;font-size:13.5px;color:var(--acc)}
+  .ficha{border-top:1px dashed var(--line);margin-top:10px;padding-top:10px;font-size:13.5px}
+  .ficha h4{margin:10px 0 4px;font-size:13px;letter-spacing:.03em}
+  .ficha ul{margin:4px 0;padding-left:20px}
+  .tick{display:flex;gap:9px;align-items:flex-start;padding:6px 8px;border-radius:5px;font-size:13.5px}
+  .tick input{margin-top:3px;accent-color:var(--amb)}
+  .tick.on{background:var(--amb-bg)}
+  .tick .est{color:var(--mut);font-size:12px;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .chip,.dchip,.tchip,.rchip{display:inline-block;font-size:11px;font-weight:600;border:1px solid var(--line);border-radius:99px;padding:1px 8px;color:var(--mut);margin-left:6px}
+  button.copy{background:var(--acc);color:var(--acc-ink);border:0;border-radius:5px;padding:6px 12px;font-size:12.5px;font-weight:650;cursor:pointer;margin-top:10px}
+  button.copy:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+  .flow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:14px 0}
+  .fn{background:var(--card);border:1.5px solid var(--line);border-radius:6px;padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer}
+  .fn.curso{border-color:var(--amb)} .fn.maqueta{border-color:var(--red)} .fn.pend{border-color:var(--gry)} .fn.hecho{border-color:var(--grn)}
+  .fe{color:var(--mut);font-size:11.5px;text-align:center;min-width:64px}
+  .fe b{display:block;font-size:14px}
+  table{border-collapse:collapse;width:100%;font-size:13.5px}
+  .tblwrap{overflow-x:auto}
+  th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-size:11.5px;letter-spacing:.05em;color:var(--mut)}
+  .mono{font-family:var(--mono);font-size:12.5px}
+  .hist{font-size:13px;color:var(--mut)}
+  @media (prefers-reduced-motion:no-preference){.card{transition:border-color .15s}}
+</style>
+<div class="wrap">
+  <header class="top">
+    <h1>🧭 audit-tracker — tracker vivo</h1>
+    <div class="sub">Dogfooding: la herramienta auditándose a sí misma · repo <span class="mono">hifede1/claude-audit-tracker</span> · v1.8.0</div>
+    <div class="meta" id="meta"></div>
+  </header>
+  <nav class="tabs" id="tabs"></nav>
+  <section class="tab" id="tab-board"></section>
+  <section class="tab" id="tab-plan"></section>
+  <section class="tab" id="tab-mapa"></section>
+  <section class="tab" id="tab-stack"></section>
+  <section class="tab" id="tab-dec"></section>
+  <section class="tab" id="tab-tests"></section>
+  <section class="tab" id="tab-refs"></section>
+</div>
+<script>
+"use strict";
+/* ============ DATOS (editar SOLO esto en actualizaciones) ============ */
+const LAST_AUDIT = "2026-07-13";
+const CLOSED_COUNT = 0;
+const CALIB = { unidad:"sesiones (~2-4h)", actores:"fede (hifede1) + Claude — misma cuenta GitHub: firma = comentario «✅ validado» en el PR", met:"directa", loop:"orquestado (despacho activo)" };
+
+const DATA = [
+ {zona:"Comandos — el producto", blocks:[
+  {id:"b-audit", n:"/audit-tracker", st:"curso",
+   existe:"Spec completa: 3 fases, calibración de 4 ítems, tracker de 7 pestañas, protocolo de re-auditoría y despacho.",
+   falta:"Primera corrida completa verificada (esta auditoría es la primera, y fue PARCIAL: la calibración degradó a defaults porque AskUserQuestion falló).",
+   ev:"plugins/audit-tracker/commands/audit-tracker.md:11-16,30-58",
+   ficha:{plant:"Es la puerta de entrada de todo el sistema: si la auditoría clasifica mal o la calibración no se hace, el resto del loop hereda el error. El problema real que resuelve: los docs mienten y el código no.",
+    met:["Correr sobre un proyecto real y comparar el informe con lo que el dueño sabe del proyecto (¿detectó las maquetas conocidas?).","Verificar que la calibración funcione también sin AskUserQuestion (S03).","Verificar re-auditoría: tick ámbar → verificación en código → verde."],
+    crit:["Una corrida end-to-end en proyecto externo con informe validado por el dueño","Calibración completa vía preguntas o vía fallback declarado","Tracker generado pasa node --check y redeploya a la misma URL"],
+    refs:["FALTANTE: docs/references/claude-code-plugins.md (S02)"]},
+   pends:[{id:"p-fallback", txt:"Fallback de calibración cuando AskUserQuestion no está disponible (defaults declarados + override posterior)", ses:"S03", est:0.5}]},
+  {id:"b-prox", n:"/proximo-encargo", st:"curso",
+   existe:"Spec estable desde v1.1: identificación de ejecutor, cola por assignee/label, reclamo 🔒, prerrequisitos, referencias por trigger, freno anti-loop.",
+   falta:"Corrida real: ninguna máquina tomó jamás un encargo. Se prueba en cuanto exista cola (S01+).",
+   ev:"plugins/audit-tracker/commands/proximo-encargo.md:7-18",
+   ficha:{plant:"El ejecutor humano/máquina de la cola compartida. Su riesgo principal: pisarse con el orquestador — el protocolo de reclamos existe pero nunca se ejercitó.",
+    met:["Tomar un encargo real desde otra máquina con la cola de este repo.","Verificar el respeto de reclamos cruzados con el orquestador."],
+    crit:["Un encargo tomado, ejecutado y con PR abierto desde /proximo-encargo","Un intento de tomar encargo reclamado por el orquestador → lo saltea"],
+    refs:[]},
+   pends:[]},
+  {id:"b-orq", n:"/orquestar", st:"maqueta",
+   existe:"Spec fuerte: loop de 8 pasos, navegación DENTRO DEL ENCARGO, canal de firma dual, reconciliación, veto, escalada, freno anti-loop, cierre de tracker. Sobrevivió un panel adversarial (8 agujeros cerrados).",
+   falta:"TODO en ejecución: cero corridas. Por el criterio del propio plugin (sin evidencia → nunca HECHO), es maqueta hasta que S01 corra de verdad.",
+   ev:"plugins/audit-tracker/commands/orquestar.md:1-60; git cf61d55 (fixes adversariales)",
+   ficha:{plant:"El corazón de la visión: loop autónomo donde la máquina verifica y el humano valida. Todo el valor del plugin depende de que este ciclo funcione en la práctica, no en el texto.",
+    met:["S01 es su primera corrida real con un encargo chico y de bajo riesgo (CI+CHANGELOG).","Provocar a propósito las ramas difíciles: cambios pedidos, veto (cerrar PR), silencio.","Después: verificador independiente (S05) y blindaje (S07)."],
+    crit:["Un ciclo completo: issue → 🔒 → plan de ataque → PR con informe de verificación → «✅ validado» → merge → re-auditoría → verde","La rama veto y la rama cambios ejercitadas al menos una vez","Jamás mergea sin firma (verificado provocándolo)"],
+    refs:["FALTANTE: docs/references/openhands-agentes.md (S02)"]},
+   pends:[
+    {id:"p-orq-run", txt:"Primera corrida real del loop (la ejecución de S01 ES la evidencia)", ses:"S01", est:0},
+    {id:"p-critic", txt:"Verificador independiente: el informe lo arma un escéptico con contexto limpio que intenta refutar (v1.9)", ses:"S05", est:1},
+    {id:"p-learn", txt:"Aprendizaje post-mortem: veto/escalada resuelta destila su lección a la referencia del tema (v2.0)", ses:"S06", est:1},
+    {id:"p-inject", txt:"Blindaje anti-inyección: solo las señales del validador mueven estado; instrucciones de terceros se reportan, no se obedecen", ses:"S07", est:0.5},
+    {id:"p-risk", txt:"Firma selectiva por riesgo + presupuesto por encargo (bajo riesgo automerge con informe; alto riesgo firma obligatoria)", ses:"S07", est:0.5}]}
+ ]},
+ {zona:"Distribución", blocks:[
+  {id:"b-dist", n:"Marketplace + manifiestos", st:"curso",
+   existe:"Estructura validada contra los docs oficiales de Claude Code; JSONs válidos (gate en verde); instalación documentada en README con alternativa curl.",
+   falta:"Nadie completó una instalación local end-to-end (el único intento fue en sesión web, donde los plugins no existen por diseño).",
+   ev:".claude-plugin/marketplace.json; plugins/audit-tracker/.claude-plugin/plugin.json; verificación vs code.claude.com/docs 2026-07-13",
+   ficha:{plant:"Si instalar falla o confunde, el plugin no existe para nadie más que este repo. El intento fallido en web ya enseñó que hay que documentar dónde NO funciona.",
+    met:["Instalación real en la máquina de fede: marketplace add → install → /reload-plugins → correr un comando.","Anotar cada fricción como troubleshooting en el README."],
+    crit:["/audit-tracker:audit-tracker responde en el CLI local tras instalar","Sección de troubleshooting en README con lo aprendido (web no soportado, /reload-plugins, namespace)"],
+    refs:[]},
+   pends:[{id:"p-install", txt:"Instalación local verificada + troubleshooting en README (requiere la máquina de fede)", ses:"S04", est:0.5}]}
+ ]},
+ {zona:"Calidad", blocks:[
+  {id:"b-ci", n:"Gates / CI del repo", st:"pend",
+   existe:"Nada automatizado. Los gates (JSON válidos, consistencia README↔comandos, node --check del tracker) corren a mano en cada sesión.",
+   falta:"Workflow de GitHub Actions que valide manifiestos y estructura en cada PR. Encargo ideal para estrenar /orquestar: chico, de bajo riesgo, verificable.",
+   ev:"ls .github → no existe (2026-07-13)",
+   ficha:{plant:"El plugin exige gates reales a los proyectos que audita… y no tiene los propios. Físico, cúrate a ti mismo — además es el encargo perfecto para la primera corrida del orquestador.",
+    met:["Workflow mínimo: parsear ambos JSON, verificar que existan los 3 comandos, node --check al tracker si cambió.","Ejecutarlo vía /orquestar (S01): la corrida es la evidencia de b-orq."],
+    crit:["PR con CI en rojo si un JSON se rompe (probado rompiéndolo a propósito en una rama)","CI en verde en main"],
+    refs:[]},
+   pends:[{id:"p-ci", txt:"CI mínimo: validar JSONs + estructura + node --check en cada PR", ses:"S01", est:0.5}]}
+ ]},
+ {zona:"Conocimiento", blocks:[
+  {id:"b-docs", n:"README + CHANGELOG + referencias propias", st:"curso",
+   existe:"README sincronizado con los comandos (verificado por panel adversarial en v1.4 y greps en cada versión). Historia de 8 versiones limpia en git.",
+   falta:"CHANGELOG.md (las versiones viven solo en mensajes de commit); y el repo viola su propia regla de referencias: la investigación OpenHands que fundó la v1.8 vive solo en el chat de una sesión.",
+   ev:"git log v1.0.0→v1.8.0; ls docs/ CHANGELOG.md → no existen (2026-07-13)",
+   ficha:{plant:"Drift doc↔código en su forma más irónica: la herramienta que exige referencias destiladas y fechadas construyó su v1.8 sobre investigación sin destilar. La próxima sesión que toque el orquestador arranca de cero.",
+    met:["CHANGELOG retroactivo desde los mensajes de commit (S01, junto al CI).","Destilar 2 referencias con triggers y fecha: openhands-agentes (critic, confirmation, microagents, stuck detection) y claude-code-plugins (anatomía de plugin/marketplace, gotchas de instalación) (S02)."],
+    crit:["CHANGELOG.md con las 8 versiones y fechas","docs/references/openhands-agentes.md y claude-code-plugins.md con frontmatter triggers, citas y fecha"],
+    refs:[]},
+   pends:[
+    {id:"p-changelog", txt:"CHANGELOG.md retroactivo v1.0.0 → v1.8.0", ses:"S01", est:0.5},
+    {id:"p-ref-oh", txt:"Referencia destilada: openhands-agentes.md (triggers: orquestador, critic, confirmation, microagents, stuck)", ses:"S02", est:0.5},
+    {id:"p-ref-cc", txt:"Referencia destilada: claude-code-plugins.md (triggers: plugin, marketplace, instalación)", ses:"S02", est:0.5}]}
+ ]}
+];
+
+const DEBT = [
+ "Dependencia dura de AskUserQuestion en calibración — falló dos veces seguidas en la corrida de hoy (hallazgo en vivo) → S03.",
+ "El loop orquestado completo (issue→PR→firma→merge→re-auditoría) tiene CERO ejecuciones: todo su estado es prosa → S01.",
+ "Investigación OpenHands sin destilar a referencia — la regla del propio plugin se violó al construir v1.8 → S02.",
+ "Sin telemetría del loop (rondas por encargo, escaladas, costo): decidir si vale la pena tras las primeras corridas (no es pendiente aún)."
+];
+
+const PLAN = [
+ {s:"S01", t:"CI mínimo + CHANGELOG — vía /orquestar (su primera corrida real)", est:1, deps:[], badge:"directo · encargo del orquestador",
+  obj:"Estrenar el loop completo con un encargo chico y de bajo riesgo que además paga la deuda de higiene.",
+  tareas:["Publicar issues de este plan (despacho)","/orquestar toma S01: workflow CI + CHANGELOG.md","Ciclo completo hasta «✅ validado» → merge → re-auditoría"],
+  cierra:["p-ci","p-changelog","p-orq-run"]},
+ {s:"S02", t:"Referencias fundacionales (openhands-agentes + claude-code-plugins)", est:1, deps:[], badge:"directo",
+  obj:"Pagar la deuda de conocimiento: destilar a docs/references/ con triggers y fecha lo que hoy vive en el chat.",
+  tareas:["openhands-agentes.md (critic, confirmation, microagents, stuck)","claude-code-plugins.md (anatomía, instalación, gotchas web/CLI)"],
+  cierra:["p-ref-oh","p-ref-cc"]},
+ {s:"S03", t:"Fallback de calibración sin AskUserQuestion", est:0.5, deps:[], badge:"directo",
+  obj:"Que la Fase 0 nunca bloquee: si la herramienta de preguntas falla, defaults declarados + override posterior.",
+  tareas:["Editar audit-tracker.md Fase 0 con el protocolo de degradación","Registrar la decisión en ⚖️"],
+  cierra:["p-fallback"]},
+ {s:"S04", t:"Instalación local verificada + troubleshooting", est:0.5, deps:[], badge:"humano + Claude",
+  obj:"Probar el camino marketplace→install→comando en la máquina de fede y documentar cada fricción.",
+  tareas:["Instalar en CLI local","README: sección troubleshooting (web no soportado, /reload-plugins, namespace)"],
+  cierra:["p-install"]},
+ {s:"S05", t:"Verificador independiente (v1.9)", est:1, deps:["S01","S02"], badge:"directo",
+  obj:"Separar ejecutor de verificador: un escéptico con contexto limpio intenta refutar el cierre antes de pedir la firma.",
+  tareas:["Diseñar el paso de verificación como agente/lente independiente en orquestar.md","El informe declara quién verificó y qué intentó refutar"],
+  cierra:["p-critic"]},
+ {s:"S06", t:"Aprendizaje post-mortem (v2.0)", est:1, deps:["S05"], badge:"directo",
+  obj:"Cerrar el ciclo de aprendizaje: cada veto o escalada resuelta destila su lección a la referencia del tema.",
+  tareas:["Regla post-mortem en orquestar.md","La re-auditoría verifica que la lección llegó a docs/references/"],
+  cierra:["p-learn"]},
+ {s:"S07", t:"Blindaje anti-inyección + firma por riesgo + presupuesto", est:1, deps:["S01"], badge:"directo",
+  obj:"Endurecer el loop desatendido una vez que rodó: señales solo del validador, umbral de firma, costo declarado.",
+  tareas:["Regla anti-inyección","Calibración de umbral de riesgo (decisión pendiente ⚖️)","Presupuesto por encargo en el informe"],
+  cierra:["p-inject","p-risk"]}
+];
+
+const CHANGELOG = [
+ {f:"2026-07-13", t:"Auditoría inicial (dogfooding). 6 bloques, 12 pendientes, 7 sesiones. Hallazgo en vivo: AskUserQuestion falló 2 veces en calibración → nace S03. Veredicto: specs fuertes, evidencia de ejecución CERO."}
+];
+
+const DECISIONS = [
+ {id:"d1", t:"El estado del loop vive en GitHub; el tracker es mapa sin backend", st:"tomada", f:"2026-07 (v1.0/v1.4)",
+  ctx:"El artifact tiene CSP estricta: no puede hablar con nada. ¿Dónde vive el estado real del trabajo?",
+  ops:"(a) tracker con backend propio · (b) estado en issues/PRs de GitHub y tracker como vista",
+  por:"GitHub ya es multi-máquina, auditable y con permisos. Un backend duplicaría todo eso con costo y fragilidad.",
+  cons:"El tracker se actualiza solo en re-auditorías; la cola de validación son los PRs abiertos, no ticks."},
+ {id:"d2", t:"La firma humana es la única puerta al merge (review o «✅ validado»)", st:"tomada", f:"2026-07-13 (v1.4)",
+  ctx:"Loop autónomo: ¿qué puede hacer la máquina sin el humano?",
+  ops:"(a) automerge con CI verde · (b) firma humana siempre · (c) firma por riesgo",
+  por:"La máquina verifica, el humano valida: división nítida de responsabilidades mientras el sistema no tenga historial de confianza. (c) queda como evolución explícita (p-risk).",
+  cons:"Cuello de botella deliberado en el validador; cap de 3 PRs esperando firma."},
+ {id:"d3", t:"Excepción de bookkeeping: el PR del tracker se automergea", st:"tomada", f:"2026-07-13 (v1.4 fix)",
+  ctx:"Panel adversarial detectó: cada cierre firmado generaba un SEGUNDO PR (tracker) exigiendo otra firma — doble firma no prometida.",
+  ops:"(a) doble firma · (b) tracker directo a default · (c) PR de tracker automergeado como contabilidad de un cierre ya firmado",
+  por:"La regla «jamás sin firma» protege el código del proyecto, no su contabilidad. (b) violaba la regla de rama+PR.",
+  cons:"El PR del tracker no cuenta para el cupo de 3; agrupable al final de la corrida."},
+ {id:"d4", t:"Referencias con triggers (estilo microagents de OpenHands)", st:"tomada", f:"2026-07-13 (v1.8)",
+  ctx:"Las referencias dependían de que la ficha las linkeara a mano: conocimiento que existe pero no llega al encargo.",
+  ops:"(a) solo links explícitos · (b) frontmatter triggers + barrido automático por tema",
+  por:"El conocimiento debe encontrar al encargo. Patrón probado por OpenHands en producción.",
+  cons:"La auditoría indexa triggers; referencias sin frontmatter se completan en re-auditoría."}
+];
+const DECISION_PENDS = [
+ {pendId:"p-risk", note:"Umbral de firma por riesgo: ¿qué clases de encargo automergean con informe (docs, tests) y cuáles exigen firma siempre (migraciones, dinero, API pública)? Decisión del validador, no del orquestador."},
+ {pendId:"p-critic", note:"¿El verificador independiente es siempre obligatorio o solo para encargos no triviales? Costo vs confianza."}
+];
+
+const TESTS = {
+ gates:[
+  {n:"JSON de manifiestos", cmd:"node -e \"JSON.parse(readFileSync(...))\" sobre marketplace.json y plugin.json", st:"grn", f:"2026-07-13"},
+  {n:"Consistencia README↔comandos", cmd:"greps de pestañas/versiones/features tras cada edición", st:"grn", f:"2026-07-13"},
+  {n:"Sintaxis JS del tracker", cmd:"node --check sobre el script extraído (obligatorio antes de cada deploy)", st:"grn", f:"2026-07-13"}
+ ],
+ flujos:[
+  {n:"Auditar → informe → tracker → despacho", st:"amb", note:"Ejercitado UNA vez (hoy) y parcial: calibración degradada por fallo de AskUserQuestion. Sin test que lo clave."},
+  {n:"Issue → /orquestar → PR+informe → firma → merge → re-auditoría", st:"red", note:"Jamás ejecutado. Es el flujo que define el producto. Se clava con S01."},
+  {n:"Marketplace → install → comando responde", st:"red", note:"Único intento en sesión web (no soportado por diseño). Local pendiente → S04."},
+  {n:"/proximo-encargo toma de la cola respetando reclamos", st:"red", note:"Sin cola hasta hoy. Se ejercita con el despacho de este plan."}
+ ],
+ deuda:"Los criterios de cierre de los 3 comandos son prosa sin test que los clave: la única forma de clavarlos son corridas reales documentadas (S01, S04) y el CI del repo para lo estructural (p-ci)."
+};
+
+const REFS = {
+ items:[],
+ faltantes:[
+  {tema:"openhands-agentes", trg:["orquestador","critic","confirmation mode","microagents","stuck detection"], para:"S05 y S07 construyen sobre esto; hoy vive solo en el chat del 2026-07-13", ses:"S02"},
+  {tema:"claude-code-plugins", trg:["plugin","marketplace","instalación","comandos","namespace"], para:"S04 (instalación) y cualquier evolución del empaquetado", ses:"S02"}
+ ],
+ nota:"docs/business/ no aplica: este repo ES la herramienta; su «negocio» son los comandos."
+};
+
+const MAPA = [
+ {n:"Auditoría", b:"b-audit", e:"auto"},
+ {n:"Tracker (7 pestañas)", b:"b-audit", e:"auto · despacho"},
+ {n:"Issues (cola)", b:"b-prox", e:"auto"},
+ {n:"/orquestar navega y ejecuta", b:"b-orq", e:"auto"},
+ {n:"PR + informe de verificación", b:"b-orq", e:"🧑 FIRMA («✅ validado»)"},
+ {n:"Merge + re-auditoría", b:"b-orq", e:"auto"},
+ {n:"Tracker al día (verde)", b:"b-audit", e:null}
+];
+
+const STACK = [
+ {capa:"Comandos (el producto)", items:"3 prompts markdown: audit-tracker · proximo-encargo · orquestar", warn:"orquestar: dormant — 0 ejecuciones"},
+ {capa:"Distribución", items:"marketplace.json (fede-tools) + plugin.json (v1.8.0) · instala vía CLI local", warn:"no funciona en sesiones web (por diseño de Claude Code)"},
+ {capa:"Runtime del loop", items:"Claude Code + gh · GitHub Issues (cola) · PRs (validación) · comentarios (rastro)", warn:"sin CI propio que proteja los manifiestos"},
+ {capa:"Artefacto", items:"este tracker HTML autocontenido · ticks en localStorage", warn:"ticks viven en UN navegador; verde solo vía re-auditoría"}
+];
+const RECORRIDOS = [
+ "Un pendiente nace en la auditoría → ficha con criterios → issue [SNN] → el orquestador lo ejecuta → PR con informe → fede comenta «✅ validado» → merge → re-auditoría lo pasa a verde acá.",
+ "Una decisión estructural aparece en el plan de ataque → el orquestador FRENA y pregunta con opciones → la respuesta vale al instante → entra como ficha ADR en la próxima re-auditoría.",
+ "Una referencia se genera en un encargo (con triggers) → otro encargo posterior la carga por trigger sin que su ficha la linkee → el catálogo la muestra con quién la usa.",
+ "Un colaborador futuro corre /proximo-encargo → ve la cola → un encargo tiene 🔒 del orquestador → lo saltea → toma el siguiente libre."
+];
+
+/* ============ RENDER (no tocar en actualizaciones normales) ============ */
+const $ = (s)=>document.querySelector(s);
+const TICKS_KEY = "at-selftracker-ticks-v1";
+const ticks = new Set(JSON.parse(localStorage.getItem(TICKS_KEY)||"[]"));
+function saveTicks(){ localStorage.setItem(TICKS_KEY, JSON.stringify([...ticks])); }
+const STN = {curso:"🟠 EN CURSO", pend:"⚪ PENDIENTE", maqueta:"⚠️ MAQUETA", hecho:"✅ HECHO"};
+function esc(x){ return String(x).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function allPends(){ return DATA.flatMap(z=>z.blocks.flatMap(b=>b.pends)); }
+
+function renderMeta(){
+  const tot = allPends().length, amb=[...ticks].length;
+  const est = allPends().reduce((a,p)=>a+p.est,0);
+  $("#meta").innerHTML = [
+    ["Última auditoría", LAST_AUDIT],["Cerrados (verde)", CLOSED_COUNT],
+    ["Marcados (ámbar)", amb],["Pendientes abiertos", tot],
+    ["Carga estimada", est+" sesiones"],["Modo", CALIB.loop]
+  ].map(m=>`<div class="m">${esc(m[0])}<b>${esc(m[1])}</b></div>`).join("");
+}
+
+const TABS = [["board","📋 Tablero"],["plan","🗓️ Plan"],["mapa","🗺️ Mapa"],["stack","🔧 Stack"],["dec","⚖️ Decisiones"],["tests","🧪 Tests"],["refs","📚 Referencias"]];
+function renderTabs(){
+  $("#tabs").innerHTML = TABS.map(t=>`<a href="#${t[0]}" id="tl-${t[0]}">${t[1]}</a>`).join("");
+}
+function show(tab){
+  if(!TABS.some(t=>t[0]===tab)) tab="board";
+  document.querySelectorAll("section.tab").forEach(s=>s.classList.remove("on"));
+  document.querySelectorAll("nav.tabs a").forEach(a=>a.classList.remove("on"));
+  $("#tab-"+tab).classList.add("on"); $("#tl-"+tab).classList.add("on");
+}
+window.addEventListener("hashchange",()=>show(location.hash.slice(1)));
+
+function tickRow(p){
+  const on = ticks.has(p.id);
+  return `<label class="tick${on?" on":""}"><input type="checkbox" data-id="${p.id}" ${on?"checked":""}>
+    <span>${esc(p.txt)} <span class="chip">${esc(p.ses)}</span></span>
+    <span class="est">${p.est||"—"} ses.</span></label>`;
+}
+function fichaHTML(b){
+  const f=b.ficha;
+  return `<details><summary>Ficha de trabajo</summary><div class="ficha">
+    <h4>🎯 PLANTEAMIENTO</h4><p>${esc(f.plant)}</p>
+    <h4>🛠️ CÓMO TRABAJARLO</h4><ul>${f.met.map(m=>`<li>${esc(m)}</li>`).join("")}</ul>
+    <h4>✅ CRITERIOS DE CIERRE</h4><ul>${f.crit.map(c=>`<li>${esc(c)}</li>`).join("")}</ul>
+    ${f.refs.length?`<h4>📚 REFERENCIAS</h4><ul>${f.refs.map(r=>`<li>${esc(r)}</li>`).join("")}</ul>`:""}
+    ${b.pends.length?`<h4>PENDIENTES</h4>${b.pends.map(tickRow).join("")}`:""}
+    <button class="copy" data-b="${b.id}">Copiar encargo</button>
+  </div></details>`;
+}
+function encargoText(b){
+  const f=b.ficha;
+  return `ENCARGO — ${b.n} (repo hifede1/claude-audit-tracker)\n\n🎯 PLANTEAMIENTO\n${f.plant}\n\n🛠️ MÉTODO\n${f.met.map((m,i)=>(i+1)+". "+m).join("\n")}\n\n✅ CRITERIOS DE CIERRE (verificables)\n${f.crit.map(c=>"- "+c).join("\n")}\n\n${f.refs.length?"📚 REFERENCIAS\n"+f.refs.join("\n")+"\n\n":""}PENDIENTES ABIERTOS\n${b.pends.filter(p=>!ticks.has(p.id)).map(p=>"- ["+p.ses+"] "+p.txt).join("\n")||"(ninguno)"}\n\nCriterio de HECHO: punta a punta + errores y bordes + gates reales. Los tres o no está hecho.`;
+}
+function renderBoard(){
+  let h = `<p class="note">Calibración: ${esc(CALIB.unidad)} · ${esc(CALIB.actores)} · metodología ${esc(CALIB.met)} · modo ${esc(CALIB.loop)}. Tick = ámbar (sin verificar). Verde solo vía re-auditoría.</p>`;
+  for(const z of DATA){
+    h += `<h2>${esc(z.zona)}</h2>`;
+    for(const b of z.blocks){
+      h += `<div class="card ${b.st}" id="card-${b.id}">
+        <div class="bh"><h3>${esc(b.n)}</h3><span class="pill p-${b.st}">${STN[b.st]}</span></div>
+        <p class="kv"><b>Qué existe:</b> ${esc(b.existe)}</p>
+        <p class="kv"><b>Qué falta:</b> ${esc(b.falta)}</p>
+        <p class="ev">evidencia: ${esc(b.ev)}</p>
+        ${fichaHTML(b)}</div>`;
+    }
+  }
+  h += `<h2>Maqueta / deuda transversal</h2><div class="card pend"><ul>${DEBT.map(d=>`<li>${esc(d)}</li>`).join("")}</ul></div>`;
+  h += `<h2>Historial</h2><div class="hist">${CHANGELOG.map(c=>`<p><b>${esc(c.f)}</b> — ${esc(c.t)}</p>`).join("")}</div>`;
+  $("#tab-board").innerHTML = h;
+}
+function renderPlan(){
+  const done = PLAN.filter(s=>s.cierra.every(id=>ticks.has(id)||!allPends().some(p=>p.id===id)));
+  let next = PLAN.find(s=>!done.includes(s) && s.deps.every(d=>done.some(x=>x.s===d)));
+  let h = `<p class="note">Total estimado: ${PLAN.reduce((a,s)=>a+s.est,0)} sesiones · según ticks: ${done.length} completada(s) · próxima resaltada. Con despacho activo, cada sesión = un issue [SNN].</p>`;
+  for(const s of PLAN){
+    const isNext = next && next.s===s.s;
+    h += `<div class="card ${done.includes(s)?"hecho":isNext?"curso":"pend"}">
+      <div class="bh"><h3>${s.s} — ${esc(s.t)}</h3>
+      <span class="chip">${s.est} ses.</span><span class="chip">${esc(s.badge)}</span>
+      ${s.deps.length?`<span class="chip">⛓️ ${s.deps.join(", ")}</span>`:""}
+      ${isNext?`<span class="pill p-curso">PRÓXIMA</span>`:""}</div>
+      <p class="kv"><b>Objetivo:</b> ${esc(s.obj)}</p>
+      <ul>${s.tareas.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>
+      <p class="ev">cierra: ${s.cierra.join(", ")}</p>
+      <button class="copy" data-s="${s.s}">Copiar encargo de sesión</button></div>`;
+  }
+  $("#tab-plan").innerHTML = h;
+}
+function sesText(s){
+  return `ENCARGO DE SESIÓN ${s.s} — ${s.t}\nRepo: hifede1/claude-audit-tracker · tratamiento: ${s.badge}\n\nOBJETIVO\n${s.obj}\n\n⛓️ PRERREQUISITOS: ${s.deps.length?s.deps.join(", "):"ninguno"}\n\nTAREAS\n${s.tareas.map((t,i)=>(i+1)+". "+t).join("\n")}\n\nCIERRA: ${s.cierra.join(", ")}\n\nCriterio de HECHO: punta a punta + errores y bordes + gates reales.`;
+}
+function renderMapa(){
+  let h = `<p class="note">El flujo end-to-end del producto. Nodo = clic abre su bloque en el tablero. Las aristas dicen qué dispara el paso — mirá dónde el sistema fluye solo y dónde depende del humano.</p><div class="flow">`;
+  MAPA.forEach((n,i)=>{
+    const st = (DATA.flatMap(z=>z.blocks).find(b=>b.id===n.b)||{}).st||"pend";
+    h += `<div class="fn ${st}" data-go="${n.b}">${esc(n.n)}</div>`;
+    if(n.e!==null && i<MAPA.length-1) h += `<div class="fe">${esc(n.e)}<b>→</b></div>`;
+  });
+  h += `</div><p class="note">La única arista humana del sistema es la FIRMA. Todo lo demás es automático — y por eso la firma es sagrada: es tu único punto de control en el ciclo.</p>`;
+  $("#tab-mapa").innerHTML = h;
+}
+function renderStack(){
+  let h = `<div class="tblwrap"><table><tr><th>CAPA</th><th>QUÉ HAY</th><th>⚠️</th></tr>`;
+  h += STACK.map(s=>`<tr><td><b>${esc(s.capa)}</b></td><td>${esc(s.items)}</td><td>${esc(s.warn)}</td></tr>`).join("");
+  h += `</table></div><h2>Recorridos reales («si entendés estos, entendés el sistema»)</h2>`;
+  h += RECORRIDOS.map((r,i)=>`<div class="card pend"><b>${i+1}.</b> ${esc(r)}</div>`).join("");
+  $("#tab-stack").innerHTML = h;
+}
+function renderDec(){
+  let h = `<p class="note">Registro ADR: el PORQUÉ del sistema. Read-only — no toca ticks ni progreso. Las pendientes derivadas de un pendiente del tablero desaparecen solas cuando este se cierra.</p>`;
+  for(const d of DECISIONS){
+    h += `<div class="card hecho"><div class="bh"><h3>${esc(d.t)}</h3><span class="pill p-hecho">TOMADA</span><span class="dchip">${esc(d.f)}</span></div>
+    <p class="kv"><b>Contexto:</b> ${esc(d.ctx)}</p><p class="kv"><b>Opciones:</b> ${esc(d.ops)}</p>
+    <p class="kv"><b>Porqué:</b> ${esc(d.por)}</p><p class="kv"><b>Consecuencias:</b> ${esc(d.cons)}</p></div>`;
+  }
+  h += `<h2>Pendientes de decisión (derivadas del tablero)</h2>`;
+  for(const dp of DECISION_PENDS){
+    const p = allPends().find(x=>x.id===dp.pendId);
+    if(!p) continue;
+    h += `<div class="card curso"><div class="bh"><h3>${esc(p.txt)}</h3><span class="pill p-curso">PENDIENTE</span><span class="dchip">${esc(p.ses)}</span></div>
+    <p class="kv">${esc(dp.note)}</p></div>`;
+  }
+  $("#tab-dec").innerHTML = h;
+}
+function renderTests(){
+  let h = `<h2>Gates reales</h2><div class="tblwrap"><table><tr><th>GATE</th><th>CÓMO CORRE</th><th>ESTADO</th><th>FECHA</th></tr>`;
+  h += TESTS.gates.map(g=>`<tr><td><b>${esc(g.n)}</b></td><td class="mono">${esc(g.cmd)}</td><td><span class="pill p-${g.st}">${g.st==="grn"?"VERDE":g.st==="amb"?"ÁMBAR":"ROJO"}</span></td><td>${esc(g.f)}</td></tr>`).join("");
+  h += `</table></div><h2>Cobertura a altitud de flujo</h2>`;
+  h += TESTS.flujos.map(f=>`<div class="card ${f.st==="grn"?"hecho":f.st==="amb"?"curso":"maqueta"}"><div class="bh"><h3>${esc(f.n)}</h3><span class="pill p-${f.st}">${f.st==="grn"?"🟢 CLAVADO":f.st==="amb"?"🟠 PARCIAL":"🔴 SIN EJERCITAR"}</span></div><p class="kv">${esc(f.note)}</p></div>`).join("");
+  h += `<h2>Deuda de verificación</h2><div class="card pend"><p class="kv">${esc(TESTS.deuda)}</p></div>`;
+  $("#tab-tests").innerHTML = h;
+}
+function renderRefs(){
+  let h = `<p class="note">${esc(REFS.nota)}</p><h2>Catálogo</h2>`;
+  if(!REFS.items.length) h += `<div class="card pend"><p class="kv"><b>docs/references/ está vacío.</b> Para una herramienta que exige referencias destiladas a los demás, esto es la deuda más irónica del repo.</p></div>`;
+  h += `<h2>🔴 Faltantes (generar ANTES del encargo que las necesita)</h2>`;
+  h += REFS.faltantes.map(r=>`<div class="card maqueta"><div class="bh"><h3>docs/references/${esc(r.tema)}.md</h3><span class="pill p-red">FALTANTE</span><span class="rchip">${esc(r.ses)}</span></div>
+    <p class="kv"><b>Triggers:</b> ${r.trg.map(t=>`<span class="rchip">${esc(t)}</span>`).join(" ")}</p>
+    <p class="kv"><b>Quién la necesita:</b> ${esc(r.para)}</p></div>`).join("");
+  $("#tab-refs").innerHTML = h;
+}
+
+document.addEventListener("change",(e)=>{
+  const id = e.target && e.target.getAttribute && e.target.getAttribute("data-id");
+  if(!id) return;
+  if(e.target.checked) ticks.add(id); else ticks.delete(id);
+  saveTicks(); renderMeta(); renderBoard(); renderPlan(); show(location.hash.slice(1)||"board");
+});
+document.addEventListener("click",(e)=>{
+  const t = e.target;
+  const go = t.getAttribute && t.getAttribute("data-go");
+  if(go){ location.hash="board"; const el=$("#card-"+go); if(el) el.scrollIntoView({behavior:"smooth"}); return; }
+  const bid = t.getAttribute && t.getAttribute("data-b");
+  const sid = t.getAttribute && t.getAttribute("data-s");
+  if(!bid && !sid) return;
+  const txt = bid ? encargoText(DATA.flatMap(z=>z.blocks).find(b=>b.id===bid))
+                  : sesText(PLAN.find(s=>s.s===sid));
+  const done = ()=>{ t.textContent="Copiado ✓"; setTimeout(()=>{t.textContent = bid?"Copiar encargo":"Copiar encargo de sesión";},1500); };
+  if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done).catch(()=>fallback(txt,done)); }
+  else fallback(txt,done);
+});
+function fallback(txt,done){
+  const ta=document.createElement("textarea"); ta.value=txt; document.body.appendChild(ta);
+  ta.select(); try{document.execCommand("copy");}catch(_){/*noop*/} document.body.removeChild(ta); done();
+}
+
+renderMeta(); renderTabs(); renderBoard(); renderPlan(); renderMapa(); renderStack(); renderDec(); renderTests(); renderRefs();
+show(location.hash.slice(1)||"board");
+</script>
