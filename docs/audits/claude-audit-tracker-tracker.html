@@ -112,8 +112,8 @@
 <script>
 "use strict";
 /* ============ DATOS (editar SOLO esto en actualizaciones) ============ */
-const LAST_AUDIT = "2026-07-13";
-const CLOSED_COUNT = 0;
+const LAST_AUDIT = "2026-07-13 (re-auditoría S01)";
+const CLOSED_COUNT = 3;
 const CALIB = { unidad:"sesiones (~2-4h)", actores:"fede (hifede1) + Claude — misma cuenta GitHub: firma = comentario «✅ validado» en el PR", met:"directa", loop:"orquestado (despacho activo)" };
 
 const DATA = [
@@ -136,16 +136,15 @@ const DATA = [
     crit:["Un encargo tomado, ejecutado y con PR abierto desde /proximo-encargo","Un intento de tomar encargo reclamado por el orquestador → lo saltea"],
     refs:[]},
    pends:[]},
-  {id:"b-orq", n:"/orquestar", st:"maqueta",
-   existe:"Spec fuerte: loop de 8 pasos, navegación DENTRO DEL ENCARGO, canal de firma dual, reconciliación, veto, escalada, freno anti-loop, cierre de tracker. Sobrevivió un panel adversarial (8 agujeros cerrados).",
-   falta:"TODO en ejecución: cero corridas. Por el criterio del propio plugin (sin evidencia → nunca HECHO), es maqueta hasta que S01 corra de verdad.",
-   ev:"plugins/audit-tracker/commands/orquestar.md:1-60; git cf61d55 (fixes adversariales)",
+  {id:"b-orq", n:"/orquestar", st:"curso",
+   existe:"Spec fuerte (loop de 8 pasos, navegación DENTRO DEL ENCARGO, firma dual, veto, escalada, freno anti-loop) + PRIMERA CORRIDA COMPLETA verificada: issue #4 → 🔒 → plan de ataque → PR #11 con informe → firma (merge del validador) → CI verde → re-auditoría (esta).",
+   falta:"Las ramas difíciles siguen sin ejercitar: cambios pedidos, veto, silencio prolongado. Y las evoluciones S05-S07 (verificador independiente, post-mortem, blindaje/riesgo).",
+   ev:"corrida S01: issues/4 + pull/11 (mergeado 2026-07-13, CI run 29255030500 verde en main); orquestar.md:1-60",
    ficha:{plant:"El corazón de la visión: loop autónomo donde la máquina verifica y el humano valida. Todo el valor del plugin depende de que este ciclo funcione en la práctica, no en el texto.",
     met:["S01 es su primera corrida real con un encargo chico y de bajo riesgo (CI+CHANGELOG).","Provocar a propósito las ramas difíciles: cambios pedidos, veto (cerrar PR), silencio.","Después: verificador independiente (S05) y blindaje (S07)."],
     crit:["Un ciclo completo: issue → 🔒 → plan de ataque → PR con informe de verificación → «✅ validado» → merge → re-auditoría → verde","La rama veto y la rama cambios ejercitadas al menos una vez","Jamás mergea sin firma (verificado provocándolo)"],
     refs:["FALTANTE: docs/references/openhands-agentes.md (S02)"]},
    pends:[
-    {id:"p-orq-run", txt:"Primera corrida real del loop (la ejecución de S01 ES la evidencia)", ses:"S01", est:0},
     {id:"p-critic", txt:"Verificador independiente: el informe lo arma un escéptico con contexto limpio que intenta refutar (v1.9)", ses:"S05", est:1},
     {id:"p-learn", txt:"Aprendizaje post-mortem: veto/escalada resuelta destila su lección a la referencia del tema (v2.0)", ses:"S06", est:1},
     {id:"p-inject", txt:"Blindaje anti-inyección: solo las señales del validador mueven estado; instrucciones de terceros se reportan, no se obedecen", ses:"S07", est:0.5},
@@ -163,44 +162,39 @@ const DATA = [
    pends:[{id:"p-install", txt:"Instalación local verificada + troubleshooting en README (requiere la máquina de fede)", ses:"S04", est:0.5}]}
  ]},
  {zona:"Calidad", blocks:[
-  {id:"b-ci", n:"Gates / CI del repo", st:"pend",
-   existe:"Nada automatizado. Los gates (JSON válidos, consistencia README↔comandos, node --check del tracker) corren a mano en cada sesión.",
-   falta:"Workflow de GitHub Actions que valide manifiestos y estructura en cada PR. Encargo ideal para estrenar /orquestar: chico, de bajo riesgo, verificable.",
-   ev:"ls .github → no existe (2026-07-13)",
-   ficha:{plant:"El plugin exige gates reales a los proyectos que audita… y no tiene los propios. Físico, cúrate a ti mismo — además es el encargo perfecto para la primera corrida del orquestador.",
-    met:["Workflow mínimo: parsear ambos JSON, verificar que existan los 3 comandos, node --check al tracker si cambió.","Ejecutarlo vía /orquestar (S01): la corrida es la evidencia de b-orq."],
-    crit:["PR con CI en rojo si un JSON se rompe (probado rompiéndolo a propósito en una rama)","CI en verde en main"],
+  {id:"b-ci", n:"Gates / CI del repo", st:"hecho",
+   existe:"validate.yml en main con los 3 gates (parseo de JSONs, estructura de comandos, node --check del tracker), corriendo en cada PR y push a main. Primera ejecución verde en el propio PR #11 (7s) y en main (run 29255030500). Test negativo verificado: JSON roto → el check falla.",
+   falta:"Nada. Mantenimiento: si aparece un artefacto ejecutable nuevo, sumar su gate al workflow.",
+   ev:".github/workflows/validate.yml; runs 86832347929 (PR) y 29255030500 (main), ambos verdes 2026-07-13",
+   ficha:{plant:"CERRADO — modo protección. El workflow es la única defensa automática del repo: cualquier cambio que lo debilite deja los manifiestos sin red.",
+    met:["No quitar ni relajar checks sin decisión registrada en ⚖️.","Antes de tocar el workflow: test negativo local (romper un JSON → el check debe fallar → restaurar).","Extraer el JS del tracker SIEMPRE por tag exacto ^<script>$ (el patrón laxo pesca la mención del comentario de cabecera)."],
+    crit:["El workflow corre en cada PR nuevo","Los 3 checks siguen presentes"],
     refs:[]},
-   pends:[{id:"p-ci", txt:"CI mínimo: validar JSONs + estructura + node --check en cada PR", ses:"S01", est:0.5}]}
+   pends:[]}
  ]},
  {zona:"Conocimiento", blocks:[
   {id:"b-docs", n:"README + CHANGELOG + referencias propias", st:"curso",
-   existe:"README sincronizado con los comandos (verificado por panel adversarial en v1.4 y greps en cada versión). Historia de 8 versiones limpia en git.",
-   falta:"CHANGELOG.md (las versiones viven solo en mensajes de commit); y el repo viola su propia regla de referencias: la investigación OpenHands que fundó la v1.8 vive solo en el chat de una sesión.",
-   ev:"git log v1.0.0→v1.8.0; ls docs/ CHANGELOG.md → no existen (2026-07-13)",
+   existe:"README sincronizado con los comandos (verificado por panel adversarial en v1.4 y greps en cada versión). CHANGELOG.md retroactivo v1.0→v1.8 con fechas reales (S01).",
+   falta:"El repo viola su propia regla de referencias: la investigación OpenHands que fundó la v1.8 vive solo en el chat de una sesión → S02.",
+   ev:"CHANGELOG.md (9 entradas, verificado en main 2026-07-13); docs/references/ → no existe",
    ficha:{plant:"Drift doc↔código en su forma más irónica: la herramienta que exige referencias destiladas y fechadas construyó su v1.8 sobre investigación sin destilar. La próxima sesión que toque el orquestador arranca de cero.",
     met:["CHANGELOG retroactivo desde los mensajes de commit (S01, junto al CI).","Destilar 2 referencias con triggers y fecha: openhands-agentes (critic, confirmation, microagents, stuck detection) y claude-code-plugins (anatomía de plugin/marketplace, gotchas de instalación) (S02)."],
     crit:["CHANGELOG.md con las 8 versiones y fechas","docs/references/openhands-agentes.md y claude-code-plugins.md con frontmatter triggers, citas y fecha"],
     refs:[]},
    pends:[
-    {id:"p-changelog", txt:"CHANGELOG.md retroactivo v1.0.0 → v1.8.0", ses:"S01", est:0.5},
     {id:"p-ref-oh", txt:"Referencia destilada: openhands-agentes.md (triggers: orquestador, critic, confirmation, microagents, stuck)", ses:"S02", est:0.5},
     {id:"p-ref-cc", txt:"Referencia destilada: claude-code-plugins.md (triggers: plugin, marketplace, instalación)", ses:"S02", est:0.5}]}
  ]}
 ];
 
 const DEBT = [
- "Dependencia dura de AskUserQuestion en calibración — falló dos veces seguidas en la corrida de hoy (hallazgo en vivo) → S03.",
- "El loop orquestado completo (issue→PR→firma→merge→re-auditoría) tiene CERO ejecuciones: todo su estado es prosa → S01.",
+ "Dependencia dura de AskUserQuestion en calibración — falló dos veces seguidas en la corrida del 2026-07-13 (hallazgo en vivo) → S03.",
+ "Ramas difíciles del loop sin ejercitar (cambios pedidos, veto, silencio prolongado) — provocarlas a propósito en próximas corridas.",
  "Investigación OpenHands sin destilar a referencia — la regla del propio plugin se violó al construir v1.8 → S02.",
  "Sin telemetría del loop (rondas por encargo, escaladas, costo): decidir si vale la pena tras las primeras corridas (no es pendiente aún)."
 ];
 
 const PLAN = [
- {s:"S01", t:"CI mínimo + CHANGELOG — vía /orquestar (su primera corrida real)", est:1, deps:[], badge:"directo · encargo del orquestador",
-  obj:"Estrenar el loop completo con un encargo chico y de bajo riesgo que además paga la deuda de higiene.",
-  tareas:["Publicar issues de este plan (despacho)","/orquestar toma S01: workflow CI + CHANGELOG.md","Ciclo completo hasta «✅ validado» → merge → re-auditoría"],
-  cierra:["p-ci","p-changelog","p-orq-run"]},
  {s:"S02", t:"Referencias fundacionales (openhands-agentes + claude-code-plugins)", est:1, deps:[], badge:"directo",
   obj:"Pagar la deuda de conocimiento: destilar a docs/references/ con triggers y fecha lo que hoy vive en el chat.",
   tareas:["openhands-agentes.md (critic, confirmation, microagents, stuck)","claude-code-plugins.md (anatomía, instalación, gotchas web/CLI)"],
@@ -213,7 +207,7 @@ const PLAN = [
   obj:"Probar el camino marketplace→install→comando en la máquina de fede y documentar cada fricción.",
   tareas:["Instalar en CLI local","README: sección troubleshooting (web no soportado, /reload-plugins, namespace)"],
   cierra:["p-install"]},
- {s:"S05", t:"Verificador independiente (v1.9)", est:1, deps:["S01","S02"], badge:"directo",
+ {s:"S05", t:"Verificador independiente (v1.9)", est:1, deps:["S02"], badge:"directo · S01 ✓ cumplido",
   obj:"Separar ejecutor de verificador: un escéptico con contexto limpio intenta refutar el cierre antes de pedir la firma.",
   tareas:["Diseñar el paso de verificación como agente/lente independiente en orquestar.md","El informe declara quién verificó y qué intentó refutar"],
   cierra:["p-critic"]},
@@ -221,13 +215,14 @@ const PLAN = [
   obj:"Cerrar el ciclo de aprendizaje: cada veto o escalada resuelta destila su lección a la referencia del tema.",
   tareas:["Regla post-mortem en orquestar.md","La re-auditoría verifica que la lección llegó a docs/references/"],
   cierra:["p-learn"]},
- {s:"S07", t:"Blindaje anti-inyección + firma por riesgo + presupuesto", est:1, deps:["S01"], badge:"directo",
+ {s:"S07", t:"Blindaje anti-inyección + firma por riesgo + presupuesto", est:1, deps:[], badge:"directo · S01 ✓ cumplido",
   obj:"Endurecer el loop desatendido una vez que rodó: señales solo del validador, umbral de firma, costo declarado.",
   tareas:["Regla anti-inyección","Calibración de umbral de riesgo (decisión pendiente ⚖️)","Presupuesto por encargo en el informe"],
   cierra:["p-inject","p-risk"]}
 ];
 
 const CHANGELOG = [
+ {f:"2026-07-13 (2)", t:"Re-auditoría tras S01 (PR #11 mergeado por hifede1 = firma; CI verde en PR y en main, verificado EN CÓDIGO). p-ci, p-changelog y p-orq-run → verde (CLOSED_COUNT 0→3). /orquestar sale de MAQUETA: primera corrida completa del loop registrada en issue #4. Gates / CI del repo → ✅ HECHO (ficha en modo protección)."},
  {f:"2026-07-13", t:"Auditoría inicial (dogfooding). 6 bloques, 12 pendientes, 7 sesiones. Hallazgo en vivo: AskUserQuestion falló 2 veces en calibración → nace S03. Veredicto: specs fuertes, evidencia de ejecución CERO."}
 ];
 
@@ -260,17 +255,18 @@ const DECISION_PENDS = [
 
 const TESTS = {
  gates:[
-  {n:"JSON de manifiestos", cmd:"node -e \"JSON.parse(readFileSync(...))\" sobre marketplace.json y plugin.json", st:"grn", f:"2026-07-13"},
-  {n:"Consistencia README↔comandos", cmd:"greps de pestañas/versiones/features tras cada edición", st:"grn", f:"2026-07-13"},
-  {n:"Sintaxis JS del tracker", cmd:"node --check sobre el script extraído (obligatorio antes de cada deploy)", st:"grn", f:"2026-07-13"}
+  {n:"JSON de manifiestos", cmd:"CI validate.yml — automatizado en cada PR y push a main (antes: a mano)", st:"grn", f:"2026-07-13"},
+  {n:"Estructura del plugin (3 comandos)", cmd:"CI validate.yml — automatizado", st:"grn", f:"2026-07-13"},
+  {n:"Sintaxis JS del tracker", cmd:"CI validate.yml (node --check, extracción por tag exacto) + obligatorio antes de cada deploy", st:"grn", f:"2026-07-13"},
+  {n:"Consistencia README↔comandos", cmd:"greps manuales tras cada edición — SIN automatizar (candidato a sumarse al CI)", st:"amb", f:"2026-07-13"}
  ],
  flujos:[
   {n:"Auditar → informe → tracker → despacho", st:"amb", note:"Ejercitado UNA vez (hoy) y parcial: calibración degradada por fallo de AskUserQuestion. Sin test que lo clave."},
-  {n:"Issue → /orquestar → PR+informe → firma → merge → re-auditoría", st:"red", note:"Jamás ejecutado. Es el flujo que define el producto. Se clava con S01."},
+  {n:"Issue → /orquestar → PR+informe → firma → merge → re-auditoría", st:"amb", note:"Ejercitado UNA vez completo (issue #4 → PR #11, firma por merge del validador, CI verde, 2026-07-13). Sin automatización que lo clave; las ramas cambios/veto/silencio siguen sin ejercitar."},
   {n:"Marketplace → install → comando responde", st:"red", note:"Único intento en sesión web (no soportado por diseño). Local pendiente → S04."},
   {n:"/proximo-encargo toma de la cola respetando reclamos", st:"red", note:"Sin cola hasta hoy. Se ejercita con el despacho de este plan."}
  ],
- deuda:"Los criterios de cierre de los 3 comandos son prosa sin test que los clave: la única forma de clavarlos son corridas reales documentadas (S01, S04) y el CI del repo para lo estructural (p-ci)."
+ deuda:"Lo estructural quedó clavado por el CI (validate.yml, desde S01). Los criterios de comportamiento de los comandos siguen siendo prosa: se clavan con corridas reales documentadas — el loop ya tiene UNA (issue #4/PR #11); faltan las ramas difíciles y la instalación local (S04)."
 };
 
 const REFS = {
