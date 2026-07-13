@@ -112,21 +112,21 @@
 <script>
 "use strict";
 /* ============ DATOS (editar SOLO esto en actualizaciones) ============ */
-const LAST_AUDIT = "2026-07-13 (re-auditoría S02)";
-const CLOSED_COUNT = 5;
+const LAST_AUDIT = "2026-07-13 (re-auditoría S03)";
+const CLOSED_COUNT = 6;
 const CALIB = { unidad:"sesiones (~2-4h)", actores:"fede (hifede1) + Claude — misma cuenta GitHub: firma = comentario «✅ validado» en el PR", met:"directa", loop:"orquestado (despacho activo)" };
 
 const DATA = [
  {zona:"Comandos — el producto", blocks:[
   {id:"b-audit", n:"/audit-tracker", st:"curso",
-   existe:"Spec completa: 3 fases, calibración de 4 ítems, tracker de 7 pestañas, protocolo de re-auditoría y despacho.",
-   falta:"Primera corrida completa verificada (esta auditoría es la primera, y fue PARCIAL: la calibración degradó a defaults porque AskUserQuestion falló).",
-   ev:"plugins/audit-tracker/commands/audit-tracker.md:11-16,30-58",
+   existe:"Spec completa: 3 fases, calibración de 4 ítems + fallback declarado (v1.8.1 — nacido y ejercitado en la corrida de hoy), tracker de 7 pestañas, protocolo de re-auditoría y despacho.",
+   falta:"Corrida completa en proyecto EXTERNO con informe validado por el dueño (el dogfooding cubre auditoría→tracker→despacho→re-auditoría, pero sobre un repo de prompts, no de código).",
+   ev:"audit-tracker.md:11-20 (fallback verificado en main d643c76); corrida dogfooding 2026-07-13",
    ficha:{plant:"Es la puerta de entrada de todo el sistema: si la auditoría clasifica mal o la calibración no se hace, el resto del loop hereda el error. El problema real que resuelve: los docs mienten y el código no.",
     met:["Correr sobre un proyecto real y comparar el informe con lo que el dueño sabe del proyecto (¿detectó las maquetas conocidas?).","Verificar que la calibración funcione también sin AskUserQuestion (S03).","Verificar re-auditoría: tick ámbar → verificación en código → verde."],
     crit:["Una corrida end-to-end en proyecto externo con informe validado por el dueño","Calibración completa vía preguntas o vía fallback declarado","Tracker generado pasa node --check y redeploya a la misma URL"],
     refs:["FALTANTE: docs/references/claude-code-plugins.md (S02)"]},
-   pends:[{id:"p-fallback", txt:"Fallback de calibración cuando AskUserQuestion no está disponible (defaults declarados + override posterior)", ses:"S03", est:0.5}]},
+   pends:[]},
   {id:"b-prox", n:"/proximo-encargo", st:"curso",
    existe:"Spec estable desde v1.1: identificación de ejecutor, cola por assignee/label, reclamo 🔒, prerrequisitos, referencias por trigger, freno anti-loop.",
    falta:"Corrida real: ninguna máquina tomó jamás un encargo. Se prueba en cuanto exista cola (S01+).",
@@ -186,16 +186,11 @@ const DATA = [
 ];
 
 const DEBT = [
- "Dependencia dura de AskUserQuestion en calibración — falló dos veces seguidas en la corrida del 2026-07-13 (hallazgo en vivo) → S03.",
  "Ramas difíciles del loop sin ejercitar (cambios pedidos, veto, silencio prolongado) — provocarlas a propósito en próximas corridas.",
  "Sin telemetría del loop (rondas por encargo, escaladas, costo): decidir si vale la pena tras las primeras corridas (no es pendiente aún)."
 ];
 
 const PLAN = [
- {s:"S03", t:"Fallback de calibración sin AskUserQuestion", est:0.5, deps:[], badge:"directo",
-  obj:"Que la Fase 0 nunca bloquee: si la herramienta de preguntas falla, defaults declarados + override posterior.",
-  tareas:["Editar audit-tracker.md Fase 0 con el protocolo de degradación","Registrar la decisión en ⚖️"],
-  cierra:["p-fallback"]},
  {s:"S04", t:"Instalación local verificada + troubleshooting", est:0.5, deps:[], badge:"humano + Claude",
   obj:"Probar el camino marketplace→install→comando en la máquina de fede y documentar cada fricción.",
   tareas:["Instalar en CLI local","README: sección troubleshooting (web no soportado, /reload-plugins, namespace)"],
@@ -215,6 +210,7 @@ const PLAN = [
 ];
 
 const CHANGELOG = [
+ {f:"2026-07-13 (4)", t:"Re-auditoría tras S03 (PR #15 mergeado = firma; v1.8.1 verificada en main). p-fallback → verde (CLOSED_COUNT 5→6). Decisión d5 al registro ADR («la Fase 0 jamás bloquea»). El hallazgo en vivo de la primera corrida quedó convertido en regla del comando en el mismo día. Cola restante: S04 (humano), S05 y S07 (ambos con decisión ⚖️ previa del validador)."},
  {f:"2026-07-13 (3)", t:"Re-auditoría tras S02 (PR #13 mergeado por hifede1 = firma; ambas referencias verificadas EN CÓDIGO en main). p-ref-oh y p-ref-cc → verde (CLOSED_COUNT 3→5). Catálogo de Referencias poblado: 2 fichas 🟢 con triggers, 0 faltantes. README+CHANGELOG+referencias → ✅ HECHO (modo protección: la frescura es el nuevo riesgo). Zona Conocimiento completa."},
  {f:"2026-07-13 (2)", t:"Re-auditoría tras S01 (PR #11 mergeado por hifede1 = firma; CI verde en PR y en main, verificado EN CÓDIGO). p-ci, p-changelog y p-orq-run → verde (CLOSED_COUNT 0→3). /orquestar sale de MAQUETA: primera corrida completa del loop registrada en issue #4. Gates / CI del repo → ✅ HECHO (ficha en modo protección)."},
  {f:"2026-07-13", t:"Auditoría inicial (dogfooding). 6 bloques, 12 pendientes, 7 sesiones. Hallazgo en vivo: AskUserQuestion falló 2 veces en calibración → nace S03. Veredicto: specs fuertes, evidencia de ejecución CERO."}
@@ -236,6 +232,11 @@ const DECISIONS = [
   ops:"(a) doble firma · (b) tracker directo a default · (c) PR de tracker automergeado como contabilidad de un cierre ya firmado",
   por:"La regla «jamás sin firma» protege el código del proyecto, no su contabilidad. (b) violaba la regla de rama+PR.",
   cons:"El PR del tracker no cuenta para el cupo de 3; agrupable al final de la corrida."},
+ {id:"d5", t:"La Fase 0 jamás bloquea: fallback declarado de calibración", st:"tomada", f:"2026-07-13 (v1.8.1)",
+  ctx:"AskUserQuestion falló dos veces en plena calibración de la primera corrida real; el comando no definía qué hacer y la puerta de entrada del sistema quedó bloqueada.",
+  ops:"(a) bloquear y esperar al humano · (b) degradar a defaults en silencio · (c) degradar DECLARANDO los defaults y su porqué, corregibles después",
+  por:"(a) mata la autonomía por una falla de herramienta; (b) esconde decisiones — lo que no se anuncia no se puede corregir. (c) mantiene el loop vivo sin robarle control al humano.",
+  cons:"Defaults visibles como calibración vigente en el tracker; corregibles en cualquier re-auditoría con una línea del usuario."},
  {id:"d4", t:"Referencias con triggers (estilo microagents de OpenHands)", st:"tomada", f:"2026-07-13 (v1.8)",
   ctx:"Las referencias dependían de que la ficha las linkeara a mano: conocimiento que existe pero no llega al encargo.",
   ops:"(a) solo links explícitos · (b) frontmatter triggers + barrido automático por tema",
