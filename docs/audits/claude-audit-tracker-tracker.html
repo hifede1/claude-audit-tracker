@@ -112,8 +112,8 @@
 <script>
 "use strict";
 /* ============ DATOS (editar SOLO esto en actualizaciones) ============ */
-const LAST_AUDIT = "2026-07-13 (re-auditoría S01)";
-const CLOSED_COUNT = 3;
+const LAST_AUDIT = "2026-07-13 (re-auditoría S02)";
+const CLOSED_COUNT = 5;
 const CALIB = { unidad:"sesiones (~2-4h)", actores:"fede (hifede1) + Claude — misma cuenta GitHub: firma = comentario «✅ validado» en el PR", met:"directa", loop:"orquestado (despacho activo)" };
 
 const DATA = [
@@ -173,32 +173,25 @@ const DATA = [
    pends:[]}
  ]},
  {zona:"Conocimiento", blocks:[
-  {id:"b-docs", n:"README + CHANGELOG + referencias propias", st:"curso",
-   existe:"README sincronizado con los comandos (verificado por panel adversarial en v1.4 y greps en cada versión). CHANGELOG.md retroactivo v1.0→v1.8 con fechas reales (S01).",
-   falta:"El repo viola su propia regla de referencias: la investigación OpenHands que fundó la v1.8 vive solo en el chat de una sesión → S02.",
-   ev:"CHANGELOG.md (9 entradas, verificado en main 2026-07-13); docs/references/ → no existe",
-   ficha:{plant:"Drift doc↔código en su forma más irónica: la herramienta que exige referencias destiladas y fechadas construyó su v1.8 sobre investigación sin destilar. La próxima sesión que toque el orquestador arranca de cero.",
-    met:["CHANGELOG retroactivo desde los mensajes de commit (S01, junto al CI).","Destilar 2 referencias con triggers y fecha: openhands-agentes (critic, confirmation, microagents, stuck detection) y claude-code-plugins (anatomía de plugin/marketplace, gotchas de instalación) (S02)."],
-    crit:["CHANGELOG.md con las 8 versiones y fechas","docs/references/openhands-agentes.md y claude-code-plugins.md con frontmatter triggers, citas y fecha"],
-    refs:[]},
-   pends:[
-    {id:"p-ref-oh", txt:"Referencia destilada: openhands-agentes.md (triggers: orquestador, critic, confirmation, microagents, stuck)", ses:"S02", est:0.5},
-    {id:"p-ref-cc", txt:"Referencia destilada: claude-code-plugins.md (triggers: plugin, marketplace, instalación)", ses:"S02", est:0.5}]}
+  {id:"b-docs", n:"README + CHANGELOG + referencias propias", st:"hecho",
+   existe:"README sincronizado (panel adversarial v1.4 + greps por versión). CHANGELOG.md v1.0→v1.8 (S01). docs/references/ poblado: openhands-agentes.md y claude-code-plugins.md con frontmatter triggers, fuentes y fecha (S02, PR #13).",
+   falta:"Nada estructural. Mantenimiento: frescura de referencias (fecha vieja = drift) y troubleshooting del README llega con S04.",
+   ev:"CHANGELOG.md (9 entradas); docs/references/*.md verificados en main 2026-07-13 (merge 825c9ec)",
+   ficha:{plant:"CERRADO — modo protección. El conocimiento del repo ya cumple su propia regla: destilado, con triggers, fuentes y fecha. El riesgo ahora es el envejecimiento silencioso.",
+    met:["Cada versión nueva del plugin suma su entrada al CHANGELOG en el mismo PR.","Referencia con fecha vieja o contradicha por las fuentes → la re-auditoría la marca 🟠 pendiente de refresco.","Los ejecutores cargan estas referencias POR TRIGGER (regla v1.8) — no dependen de links manuales."],
+    crit:["CHANGELOG al día con la última versión","Ambas referencias con fecha vigente y sin contradicciones conocidas"],
+    refs:["docs/references/openhands-agentes.md","docs/references/claude-code-plugins.md"]},
+   pends:[]}
  ]}
 ];
 
 const DEBT = [
  "Dependencia dura de AskUserQuestion en calibración — falló dos veces seguidas en la corrida del 2026-07-13 (hallazgo en vivo) → S03.",
  "Ramas difíciles del loop sin ejercitar (cambios pedidos, veto, silencio prolongado) — provocarlas a propósito en próximas corridas.",
- "Investigación OpenHands sin destilar a referencia — la regla del propio plugin se violó al construir v1.8 → S02.",
  "Sin telemetría del loop (rondas por encargo, escaladas, costo): decidir si vale la pena tras las primeras corridas (no es pendiente aún)."
 ];
 
 const PLAN = [
- {s:"S02", t:"Referencias fundacionales (openhands-agentes + claude-code-plugins)", est:1, deps:[], badge:"directo",
-  obj:"Pagar la deuda de conocimiento: destilar a docs/references/ con triggers y fecha lo que hoy vive en el chat.",
-  tareas:["openhands-agentes.md (critic, confirmation, microagents, stuck)","claude-code-plugins.md (anatomía, instalación, gotchas web/CLI)"],
-  cierra:["p-ref-oh","p-ref-cc"]},
  {s:"S03", t:"Fallback de calibración sin AskUserQuestion", est:0.5, deps:[], badge:"directo",
   obj:"Que la Fase 0 nunca bloquee: si la herramienta de preguntas falla, defaults declarados + override posterior.",
   tareas:["Editar audit-tracker.md Fase 0 con el protocolo de degradación","Registrar la decisión en ⚖️"],
@@ -207,7 +200,7 @@ const PLAN = [
   obj:"Probar el camino marketplace→install→comando en la máquina de fede y documentar cada fricción.",
   tareas:["Instalar en CLI local","README: sección troubleshooting (web no soportado, /reload-plugins, namespace)"],
   cierra:["p-install"]},
- {s:"S05", t:"Verificador independiente (v1.9)", est:1, deps:["S02"], badge:"directo · S01 ✓ cumplido",
+ {s:"S05", t:"Verificador independiente (v1.9)", est:1, deps:[], badge:"directo · S01 y S02 ✓ cumplidos",
   obj:"Separar ejecutor de verificador: un escéptico con contexto limpio intenta refutar el cierre antes de pedir la firma.",
   tareas:["Diseñar el paso de verificación como agente/lente independiente en orquestar.md","El informe declara quién verificó y qué intentó refutar"],
   cierra:["p-critic"]},
@@ -222,6 +215,7 @@ const PLAN = [
 ];
 
 const CHANGELOG = [
+ {f:"2026-07-13 (3)", t:"Re-auditoría tras S02 (PR #13 mergeado por hifede1 = firma; ambas referencias verificadas EN CÓDIGO en main). p-ref-oh y p-ref-cc → verde (CLOSED_COUNT 3→5). Catálogo de Referencias poblado: 2 fichas 🟢 con triggers, 0 faltantes. README+CHANGELOG+referencias → ✅ HECHO (modo protección: la frescura es el nuevo riesgo). Zona Conocimiento completa."},
  {f:"2026-07-13 (2)", t:"Re-auditoría tras S01 (PR #11 mergeado por hifede1 = firma; CI verde en PR y en main, verificado EN CÓDIGO). p-ci, p-changelog y p-orq-run → verde (CLOSED_COUNT 0→3). /orquestar sale de MAQUETA: primera corrida completa del loop registrada en issue #4. Gates / CI del repo → ✅ HECHO (ficha en modo protección)."},
  {f:"2026-07-13", t:"Auditoría inicial (dogfooding). 6 bloques, 12 pendientes, 7 sesiones. Hallazgo en vivo: AskUserQuestion falló 2 veces en calibración → nace S03. Veredicto: specs fuertes, evidencia de ejecución CERO."}
 ];
@@ -270,11 +264,11 @@ const TESTS = {
 };
 
 const REFS = {
- items:[],
- faltantes:[
-  {tema:"openhands-agentes", trg:["orquestador","critic","confirmation mode","microagents","stuck detection"], para:"S05 y S07 construyen sobre esto; hoy vive solo en el chat del 2026-07-13", ses:"S02"},
-  {tema:"claude-code-plugins", trg:["plugin","marketplace","instalación","comandos","namespace"], para:"S04 (instalación) y cualquier evolución del empaquetado", ses:"S02"}
+ items:[
+  {tema:"openhands-agentes", trg:["orquestador","critic","verificador","confirmation mode","microagents","stuck detection","firma por riesgo","presupuesto","loop autónomo"], f:"2026-07-13", usa:"S05 (critic) · S07 (ConfirmRisky/presupuesto) · adopciones v1.8 documentadas (triggers, freno anti-loop)"},
+  {tema:"claude-code-plugins", trg:["plugin","marketplace","instalación","comandos","namespace","reload","distribución"], f:"2026-07-13", usa:"S04 (instalación local) · cualquier evolución del empaquetado"}
  ],
+ faltantes:[],
  nota:"docs/business/ no aplica: este repo ES la herramienta; su «negocio» son los comandos."
 };
 
@@ -435,10 +429,15 @@ function renderTests(){
 function renderRefs(){
   let h = `<p class="note">${esc(REFS.nota)}</p><h2>Catálogo</h2>`;
   if(!REFS.items.length) h += `<div class="card pend"><p class="kv"><b>docs/references/ está vacío.</b> Para una herramienta que exige referencias destiladas a los demás, esto es la deuda más irónica del repo.</p></div>`;
-  h += `<h2>🔴 Faltantes (generar ANTES del encargo que las necesita)</h2>`;
-  h += REFS.faltantes.map(r=>`<div class="card maqueta"><div class="bh"><h3>docs/references/${esc(r.tema)}.md</h3><span class="pill p-red">FALTANTE</span><span class="rchip">${esc(r.ses)}</span></div>
+  h += REFS.items.map(r=>`<div class="card hecho"><div class="bh"><h3>docs/references/${esc(r.tema)}.md</h3><span class="pill p-grn">🟢 FRESCA</span><span class="rchip">${esc(r.f)}</span></div>
+    <p class="kv"><b>Triggers:</b> ${r.trg.map(t=>`<span class="rchip">${esc(t)}</span>`).join(" ")}</p>
+    <p class="kv"><b>Quién la usa:</b> ${esc(r.usa)}</p></div>`).join("");
+  if(REFS.faltantes.length){
+    h += `<h2>🔴 Faltantes (generar ANTES del encargo que las necesita)</h2>`;
+    h += REFS.faltantes.map(r=>`<div class="card maqueta"><div class="bh"><h3>docs/references/${esc(r.tema)}.md</h3><span class="pill p-red">FALTANTE</span><span class="rchip">${esc(r.ses)}</span></div>
     <p class="kv"><b>Triggers:</b> ${r.trg.map(t=>`<span class="rchip">${esc(t)}</span>`).join(" ")}</p>
     <p class="kv"><b>Quién la necesita:</b> ${esc(r.para)}</p></div>`).join("");
+  }
   $("#tab-refs").innerHTML = h;
 }
 
