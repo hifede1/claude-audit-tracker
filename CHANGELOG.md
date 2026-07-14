@@ -2,6 +2,11 @@
 
 Formato: una entrada por versión del plugin. El detalle fino vive en los mensajes de commit.
 
+## v1.10.0 — 2026-07-13
+- **Blindaje anti-inyección**: solo las señales del validador (firma, cambios, veto, decisiones) mueven el estado del loop; instrucciones de terceros en issues/comentarios/logs se reportan como hallazgo, jamás se obedecen. Duda = tercero.
+- **Firma selectiva por riesgo**: ítem 5 de calibración — clases de encargo auto-mergeables con CI verde + informe de dos actores (default: NINGUNA; la zona gris se firma). El orquestador jamás clasifica en zona gris.
+- **Presupuesto por encargo**: se declara al reclamar (límite operativo derivado de la estimación de la ficha; superarlo dispara el freno anti-loop) y el informe cierra con el costo real.
+
 ## v1.9.0 — 2026-07-13
 - **Verificador independiente** (inspirado en el critic model de OpenHands): la verificación del orquestador pasa a dos actores — el ejecutor hace su pasada y un escéptico de CONTEXTO LIMPIO (solo ficha + diff + repo) intenta refutar cada criterio; lo tumbado se corrige antes de pedir firma. El informe declara quién ejecutó, quién verificó, qué se intentó refutar y qué sobrevivió. Alcance (d6): todo encargo salvo bookkeeping. Sin subagentes disponibles, degradación DECLARADA (filosofía d5).
 
