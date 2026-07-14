@@ -112,8 +112,8 @@
 <script>
 "use strict";
 /* ============ DATOS (editar SOLO esto en actualizaciones) ============ */
-const LAST_AUDIT = "2026-07-13 (re-auditoría S03)";
-const CLOSED_COUNT = 6;
+const LAST_AUDIT = "2026-07-13 (re-auditoría S05)";
+const CLOSED_COUNT = 7;
 const CALIB = { unidad:"sesiones (~2-4h)", actores:"fede (hifede1) + Claude — misma cuenta GitHub: firma = comentario «✅ validado» en el PR", met:"directa", loop:"orquestado (despacho activo)" };
 
 const DATA = [
@@ -137,15 +137,14 @@ const DATA = [
     refs:[]},
    pends:[]},
   {id:"b-orq", n:"/orquestar", st:"curso",
-   existe:"Spec fuerte (loop de 8 pasos, navegación DENTRO DEL ENCARGO, firma dual, veto, escalada, freno anti-loop) + PRIMERA CORRIDA COMPLETA verificada: issue #4 → 🔒 → plan de ataque → PR #11 con informe → firma (merge del validador) → CI verde → re-auditoría (esta).",
-   falta:"Las ramas difíciles siguen sin ejercitar: cambios pedidos, veto, silencio prolongado. Y las evoluciones S05-S07 (verificador independiente, post-mortem, blindaje/riesgo).",
-   ev:"corrida S01: issues/4 + pull/11 (mergeado 2026-07-13, CI run 29255030500 verde en main); orquestar.md:1-60",
+   existe:"Spec fuerte (loop de 8 pasos, navegación DENTRO DEL ENCARGO, firma dual, veto, escalada, freno anti-loop) + 4 corridas completas verificadas (S01-S03, S05) + verificación en DOS ACTORES (v1.9) adoptada Y ejercitada: en su PR de estreno el escéptico tumbó 3 defectos reales del ejecutor.",
+   falta:"Ramas difíciles sin ejercitar (cambios pedidos, veto, silencio prolongado con reconciliación) y las evoluciones S06 (post-mortem) y S07 (blindaje/riesgo).",
+   ev:"corridas: issues/4,5,6,8 con PRs 11,13,15,17 mergeados; escéptico en acción: PR #17 + fix a727eb3; orquestar.md paso 5 (dos actores)",
    ficha:{plant:"El corazón de la visión: loop autónomo donde la máquina verifica y el humano valida. Todo el valor del plugin depende de que este ciclo funcione en la práctica, no en el texto.",
     met:["S01 es su primera corrida real con un encargo chico y de bajo riesgo (CI+CHANGELOG).","Provocar a propósito las ramas difíciles: cambios pedidos, veto (cerrar PR), silencio.","Después: verificador independiente (S05) y blindaje (S07)."],
     crit:["Un ciclo completo: issue → 🔒 → plan de ataque → PR con informe de verificación → «✅ validado» → merge → re-auditoría → verde","La rama veto y la rama cambios ejercitadas al menos una vez","Jamás mergea sin firma (verificado provocándolo)"],
     refs:["FALTANTE: docs/references/openhands-agentes.md (S02)"]},
    pends:[
-    {id:"p-critic", txt:"Verificador independiente: el informe lo arma un escéptico con contexto limpio que intenta refutar (v1.9)", ses:"S05", est:1},
     {id:"p-learn", txt:"Aprendizaje post-mortem: veto/escalada resuelta destila su lección a la referencia del tema (v2.0)", ses:"S06", est:1},
     {id:"p-inject", txt:"Blindaje anti-inyección: solo las señales del validador mueven estado; instrucciones de terceros se reportan, no se obedecen", ses:"S07", est:0.5},
     {id:"p-risk", txt:"Firma selectiva por riesgo + presupuesto por encargo (bajo riesgo automerge con informe; alto riesgo firma obligatoria)", ses:"S07", est:0.5}]}
@@ -199,7 +198,7 @@ const PLAN = [
   obj:"Separar ejecutor de verificador: un escéptico con contexto limpio intenta refutar el cierre antes de pedir la firma.",
   tareas:["Diseñar el paso de verificación como agente/lente independiente en orquestar.md","El informe declara quién verificó y qué intentó refutar"],
   cierra:["p-critic"]},
- {s:"S06", t:"Aprendizaje post-mortem (v2.0)", est:1, deps:["S05"], badge:"directo",
+ {s:"S06", t:"Aprendizaje post-mortem (v2.0)", est:1, deps:[], badge:"directo · S05 ✓ cumplido",
   obj:"Cerrar el ciclo de aprendizaje: cada veto o escalada resuelta destila su lección a la referencia del tema.",
   tareas:["Regla post-mortem en orquestar.md","La re-auditoría verifica que la lección llegó a docs/references/"],
   cierra:["p-learn"]},
@@ -210,6 +209,7 @@ const PLAN = [
 ];
 
 const CHANGELOG = [
+ {f:"2026-07-13 (5)", t:"Re-auditoría tras S05 (PR #17 mergeado = firma; v1.9.0 verificada en main). p-critic → verde (CLOSED_COUNT 6→7). Decisiones d6 (verificador: todo encargo salvo bookkeeping) y d7 (nada automergea por ahora) al ADR; DECISION_PENDS vacío — cero decisiones bloqueando. Evidencia fundacional de la v1.9: en su PR de estreno, el escéptico de contexto limpio tumbó 3 defectos reales del ejecutor. Cola restante: S04 (máquina del validador), S06 y S07 (desbloqueados)."},
  {f:"2026-07-13 (4)", t:"Re-auditoría tras S03 (PR #15 mergeado = firma; v1.8.1 verificada en main). p-fallback → verde (CLOSED_COUNT 5→6). Decisión d5 al registro ADR («la Fase 0 jamás bloquea»). El hallazgo en vivo de la primera corrida quedó convertido en regla del comando en el mismo día. Cola restante: S04 (humano), S05 y S07 (ambos con decisión ⚖️ previa del validador)."},
  {f:"2026-07-13 (3)", t:"Re-auditoría tras S02 (PR #13 mergeado por hifede1 = firma; ambas referencias verificadas EN CÓDIGO en main). p-ref-oh y p-ref-cc → verde (CLOSED_COUNT 3→5). Catálogo de Referencias poblado: 2 fichas 🟢 con triggers, 0 faltantes. README+CHANGELOG+referencias → ✅ HECHO (modo protección: la frescura es el nuevo riesgo). Zona Conocimiento completa."},
  {f:"2026-07-13 (2)", t:"Re-auditoría tras S01 (PR #11 mergeado por hifede1 = firma; CI verde en PR y en main, verificado EN CÓDIGO). p-ci, p-changelog y p-orq-run → verde (CLOSED_COUNT 0→3). /orquestar sale de MAQUETA: primera corrida completa del loop registrada en issue #4. Gates / CI del repo → ✅ HECHO (ficha en modo protección)."},
@@ -232,6 +232,16 @@ const DECISIONS = [
   ops:"(a) doble firma · (b) tracker directo a default · (c) PR de tracker automergeado como contabilidad de un cierre ya firmado",
   por:"La regla «jamás sin firma» protege el código del proyecto, no su contabilidad. (b) violaba la regla de rama+PR.",
   cons:"El PR del tracker no cuenta para el cupo de 3; agrupable al final de la corrida."},
+ {id:"d7", t:"Umbral de firma por riesgo: por ahora NADA automergea", st:"tomada", f:"2026-07-13 (para S07)",
+  ctx:"S07 construirá el mecanismo de firma selectiva; había que fijar el umbral inicial antes de codificar.",
+  ops:"(a) automerge para docs/tests desde el día uno · (b) todo se firma, y el umbral se afloja tras ~10 corridas con datos",
+  por:"La confianza se gradúa con historial, no por adelantado. Validada por el dueño en sesión (registrada en issue #10).",
+  cons:"S07 implementa el mecanismo con default conservador; revisar el umbral tras ~10 ciclos del loop."},
+ {id:"d6", t:"El verificador independiente revisa TODO encargo salvo bookkeeping", st:"tomada", f:"2026-07-13 (v1.9)",
+  ctx:"El ejecutor tiene sesgo a aprobarse; había que fijar el alcance del escéptico de contexto limpio antes de codificar S05.",
+  ops:"(a) solo encargos no triviales · (b) todo encargo salvo bookkeeping · (c) todo sin excepción",
+  por:"En etapa de construir confianza el costo extra compra evidencia; el bookkeeping ya refleja cierres firmados (d3). Validada por el dueño en sesión. Se relaja con datos.",
+  cons:"Primer ejercicio real (PR #17): el escéptico tumbó 3 defectos del propio PR que lo introducía — fuga de IDs al comando genérico, referencia contradicha, ping-pong sin tope."},
  {id:"d5", t:"La Fase 0 jamás bloquea: fallback declarado de calibración", st:"tomada", f:"2026-07-13 (v1.8.1)",
   ctx:"AskUserQuestion falló dos veces en plena calibración de la primera corrida real; el comando no definía qué hacer y la puerta de entrada del sistema quedó bloqueada.",
   ops:"(a) bloquear y esperar al humano · (b) degradar a defaults en silencio · (c) degradar DECLARANDO los defaults y su porqué, corregibles después",
@@ -243,10 +253,7 @@ const DECISIONS = [
   por:"El conocimiento debe encontrar al encargo. Patrón probado por OpenHands en producción.",
   cons:"La auditoría indexa triggers; referencias sin frontmatter se completan en re-auditoría."}
 ];
-const DECISION_PENDS = [
- {pendId:"p-risk", note:"Umbral de firma por riesgo: ¿qué clases de encargo automergean con informe (docs, tests) y cuáles exigen firma siempre (migraciones, dinero, API pública)? Decisión del validador, no del orquestador."},
- {pendId:"p-critic", note:"¿El verificador independiente es siempre obligatorio o solo para encargos no triviales? Costo vs confianza."}
-];
+const DECISION_PENDS = [];
 
 const TESTS = {
  gates:[
