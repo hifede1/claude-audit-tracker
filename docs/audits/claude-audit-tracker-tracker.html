@@ -112,20 +112,20 @@
 <script>
 "use strict";
 /* ============ DATOS (editar SOLO esto en actualizaciones) ============ */
-const LAST_AUDIT = "2026-07-14 (re-auditoría S07)";
+const LAST_AUDIT = "2026-07-14 (corrida externa validada)";
 const CLOSED_COUNT = 9;
 const CALIB = { unidad:"sesiones (~2-4h)", actores:"fede (hifede1) + Claude — misma cuenta GitHub: firma = comentario «✅ validado» en el PR", met:"directa", loop:"orquestado (despacho activo)" };
 
 const DATA = [
  {zona:"Comandos — el producto", blocks:[
-  {id:"b-audit", n:"/audit-tracker", st:"curso",
-   existe:"Spec completa: 3 fases, calibración de 4 ítems + fallback declarado (v1.8.1 — nacido y ejercitado en la corrida de hoy), tracker de 7 pestañas, protocolo de re-auditoría y despacho.",
-   falta:"Corrida completa en proyecto EXTERNO con informe validado por el dueño (el dogfooding cubre auditoría→tracker→despacho→re-auditoría, pero sobre un repo de prompts, no de código).",
-   ev:"audit-tracker.md:11-20 (fallback verificado en main d643c76); corrida dogfooding 2026-07-13",
-   ficha:{plant:"Es la puerta de entrada de todo el sistema: si la auditoría clasifica mal o la calibración no se hace, el resto del loop hereda el error. El problema real que resuelve: los docs mienten y el código no.",
-    met:["Correr sobre un proyecto real y comparar el informe con lo que el dueño sabe del proyecto (¿detectó las maquetas conocidas?).","Verificar que la calibración funcione también sin AskUserQuestion (S03).","Verificar re-auditoría: tick ámbar → verificación en código → verde."],
-    crit:["Una corrida end-to-end en proyecto externo con informe validado por el dueño","Calibración completa vía preguntas o vía fallback declarado","Tracker generado pasa node --check y redeploya a la misma URL"],
-    refs:["FALTANTE: docs/references/claude-code-plugins.md (S02)"]},
+  {id:"b-audit", n:"/audit-tracker", st:"hecho",
+   existe:"Spec completa (3 fases, calibración de 5 ítems + fallback declarado, tracker de 7 pestañas, re-auditoría, despacho) Y ejercitada de punta a punta en proyecto EXTERNO: nuecesmecohue 2026-07-14 — calibración por preguntas, base viva verificada (Supabase producción), 3 clústers de código en paralelo, tracker HEREDADO retomado y redeployado a su misma URL, cola de 8 encargos publicada, y el informe validado por el dueño.",
+   falta:"Nada estructural. Mantenimiento: cada corrida nueva alimenta el Troubleshooting si aparece fricción.",
+   ev:"nuecesmecohue: PR #9 (automergeado por umbral, CI verde) + issues #10-#17 + tracker en URL heredada; validación del dueño 2026-07-14 en sesión; calibración con AskUserQuestion funcionando (4 preguntas)",
+   ficha:{plant:"CERRADO — modo protección. La puerta de entrada del sistema está probada en las dos variantes: dogfooding (repo de prompts) y proyecto externo real (e-commerce con DB viva). El riesgo restante es de mantenimiento, no de diseño.",
+    met:["La corrida externa verificó las dos ramas de la calibración: AskUserQuestion (funcionó) y el fallback v1.8.1 (queda probado del dogfooding).","Retomar un tracker heredado (protocolo de otra sesión) también quedó ejercitado: URL respetada, node --check, rama+PR.","Si una corrida futura encuentra fricción nueva → entrada en Troubleshooting + pendiente en este bloque."],
+    crit:["Corrida end-to-end en proyecto externo con informe validado por el dueño ✓ (nuecesmecohue 2026-07-14)","Calibración completa vía preguntas o fallback ✓ (ambas ramas probadas)","Tracker pasa node --check y redeploya a la misma URL ✓ (incluida URL heredada de otra conversación)"],
+    refs:["docs/references/claude-code-plugins.md"]},
    pends:[]},
   {id:"b-prox", n:"/proximo-encargo", st:"curso",
    existe:"Spec estable desde v1.1: identificación de ejecutor, cola por assignee/label, reclamo 🔒, prerrequisitos, referencias por trigger, freno anti-loop.",
@@ -204,6 +204,7 @@ const PLAN = [
 ];
 
 const CHANGELOG = [
+ {f:"2026-07-14 (2)", t:"CORRIDA EXTERNA VALIDADA por el dueño → /audit-tracker (b-audit) pasa a ✅ HECHO. Primera ejecución real en proyecto ajeno al plugin: nuecesmecohue (e-commerce con Supabase en producción). Cubrió lo que el dogfooding no podía: calibración con AskUserQuestion real (4 preguntas, funcionó), verificación contra base viva (9 negativos exactos, 44/58 divergentes — el tracker heredado resultó veraz), retoma de tracker HEREDADO de otra sesión (URL respetada vía parámetro url), despacho de 8 encargos, y ESTRENO del automerge por umbral de riesgo (PR #9, clase docs, CI verde): la v1.10 funcionando en el mundo real el mismo día que se escribió. Los 3 comandos quedan ✅; el sistema entero queda en modo protección + evolución (S04 instalación local, S06 espera veto)."},
  {f:"2026-07-14", t:"Re-auditoría tras S07 (PR #19 mergeado = firma; v1.10.0 verificada en main). p-inject y p-risk → verde (CLOSED_COUNT 7→9). El loop quedó endurecido: blindaje anti-inyección (con manejo de 🔒 sospechosos), firma por riesgo (default d7: nada automergea) y presupuesto por encargo (estrenado en el propio PR #19: dentro del presupuesto declarado). El escéptico tumbó 6 defectos de coherencia antes de la firma. Restan: S06 (en pausa hasta el primer veto real) y S04 (máquina del validador)."},
  {f:"2026-07-13 (5)", t:"Re-auditoría tras S05 (PR #17 mergeado = firma; v1.9.0 verificada en main). p-critic → verde (CLOSED_COUNT 6→7). Decisiones d6 (verificador: todo encargo salvo bookkeeping) y d7 (nada automergea por ahora) al ADR; DECISION_PENDS vacío — cero decisiones bloqueando. Evidencia fundacional de la v1.9: en su PR de estreno, el escéptico de contexto limpio tumbó 3 defectos reales del ejecutor. Cola restante: S04 (máquina del validador), S06 y S07 (desbloqueados)."},
  {f:"2026-07-13 (4)", t:"Re-auditoría tras S03 (PR #15 mergeado = firma; v1.8.1 verificada en main). p-fallback → verde (CLOSED_COUNT 5→6). Decisión d5 al registro ADR («la Fase 0 jamás bloquea»). El hallazgo en vivo de la primera corrida quedó convertido en regla del comando en el mismo día. Cola restante: S04 (humano), S05 y S07 (ambos con decisión ⚖️ previa del validador)."},
