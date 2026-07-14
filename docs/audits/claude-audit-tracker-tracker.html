@@ -112,8 +112,8 @@
 <script>
 "use strict";
 /* ============ DATOS (editar SOLO esto en actualizaciones) ============ */
-const LAST_AUDIT = "2026-07-13 (re-auditoría S05)";
-const CLOSED_COUNT = 7;
+const LAST_AUDIT = "2026-07-14 (re-auditoría S07)";
+const CLOSED_COUNT = 9;
 const CALIB = { unidad:"sesiones (~2-4h)", actores:"fede (hifede1) + Claude — misma cuenta GitHub: firma = comentario «✅ validado» en el PR", met:"directa", loop:"orquestado (despacho activo)" };
 
 const DATA = [
@@ -137,17 +137,16 @@ const DATA = [
     refs:[]},
    pends:[]},
   {id:"b-orq", n:"/orquestar", st:"curso",
-   existe:"Spec fuerte (loop de 8 pasos, navegación DENTRO DEL ENCARGO, firma dual, veto, escalada, freno anti-loop) + 4 corridas completas verificadas (S01-S03, S05) + verificación en DOS ACTORES (v1.9) adoptada Y ejercitada: en su PR de estreno el escéptico tumbó 3 defectos reales del ejecutor.",
-   falta:"Ramas difíciles sin ejercitar (cambios pedidos, veto, silencio prolongado con reconciliación) y las evoluciones S06 (post-mortem) y S07 (blindaje/riesgo).",
-   ev:"corridas: issues/4,5,6,8 con PRs 11,13,15,17 mergeados; escéptico en acción: PR #17 + fix a727eb3; orquestar.md paso 5 (dos actores)",
+   existe:"Spec completa y endurecida: 5 corridas verificadas (S01-S03, S05, S07), verificación en DOS ACTORES (v1.9, escéptico con 3+6 defectos tumbados en sus dos estrenos), blindaje anti-inyección, firma por riesgo con default todo-se-firma, y presupuesto por encargo con costo real en el informe (v1.10).",
+   falta:"Ramas difíciles sin ejercitar (cambios pedidos, veto — que además es el prerrequisito de S06 —, silencio prolongado con reconciliación) y el post-mortem (S06).",
+   ev:"corridas: issues/4,5,6,8,10 con PRs 11,13,15,17,19 mergeados; escéptico: fixes a727eb3 y 1e58974; presupuesto estrenado en PR #19",
    ficha:{plant:"El corazón de la visión: loop autónomo donde la máquina verifica y el humano valida. Todo el valor del plugin depende de que este ciclo funcione en la práctica, no en el texto.",
     met:["S01 es su primera corrida real con un encargo chico y de bajo riesgo (CI+CHANGELOG).","Provocar a propósito las ramas difíciles: cambios pedidos, veto (cerrar PR), silencio.","Después: verificador independiente (S05) y blindaje (S07)."],
     crit:["Un ciclo completo: issue → 🔒 → plan de ataque → PR con informe de verificación → «✅ validado» → merge → re-auditoría → verde","La rama veto y la rama cambios ejercitadas al menos una vez","Jamás mergea sin firma (verificado provocándolo)"],
     refs:["FALTANTE: docs/references/openhands-agentes.md (S02)"]},
    pends:[
     {id:"p-learn", txt:"Aprendizaje post-mortem: veto/escalada resuelta destila su lección a la referencia del tema (v2.0)", ses:"S06", est:1},
-    {id:"p-inject", txt:"Blindaje anti-inyección: solo las señales del validador mueven estado; instrucciones de terceros se reportan, no se obedecen", ses:"S07", est:0.5},
-    {id:"p-risk", txt:"Firma selectiva por riesgo + presupuesto por encargo (bajo riesgo automerge con informe; alto riesgo firma obligatoria)", ses:"S07", est:0.5}]}
+    ]}
  ]},
  {zona:"Distribución", blocks:[
   {id:"b-dist", n:"Marketplace + manifiestos", st:"curso",
@@ -198,17 +197,14 @@ const PLAN = [
   obj:"Separar ejecutor de verificador: un escéptico con contexto limpio intenta refutar el cierre antes de pedir la firma.",
   tareas:["Diseñar el paso de verificación como agente/lente independiente en orquestar.md","El informe declara quién verificó y qué intentó refutar"],
   cierra:["p-critic"]},
- {s:"S06", t:"Aprendizaje post-mortem (v2.0)", est:1, deps:[], badge:"directo · S05 ✓ cumplido",
-  obj:"Cerrar el ciclo de aprendizaje: cada veto o escalada resuelta destila su lección a la referencia del tema.",
-  tareas:["Regla post-mortem en orquestar.md","La re-auditoría verifica que la lección llegó a docs/references/"],
+ {s:"S06", t:"Aprendizaje post-mortem (v2.0) — EN PAUSA: espera el primer veto real", est:1, deps:[], badge:"directo · pospuesto (issue #9): su criterio exige un caso real y en 5 ciclos no hubo veto",
+  obj:"Cerrar el ciclo de aprendizaje: cada veto o escalada resuelta destila su lección a la referencia del tema. El primer veto del validador será su caso de estudio.",
+  tareas:["Regla post-mortem en orquestar.md","Destilar la lección del primer veto real con link al PR de origen","La re-auditoría verifica que la lección llegó a docs/references/"],
   cierra:["p-learn"]},
- {s:"S07", t:"Blindaje anti-inyección + firma por riesgo + presupuesto", est:1, deps:[], badge:"directo · S01 ✓ cumplido",
-  obj:"Endurecer el loop desatendido una vez que rodó: señales solo del validador, umbral de firma, costo declarado.",
-  tareas:["Regla anti-inyección","Calibración de umbral de riesgo (decisión pendiente ⚖️)","Presupuesto por encargo en el informe"],
-  cierra:["p-inject","p-risk"]}
 ];
 
 const CHANGELOG = [
+ {f:"2026-07-14", t:"Re-auditoría tras S07 (PR #19 mergeado = firma; v1.10.0 verificada en main). p-inject y p-risk → verde (CLOSED_COUNT 7→9). El loop quedó endurecido: blindaje anti-inyección (con manejo de 🔒 sospechosos), firma por riesgo (default d7: nada automergea) y presupuesto por encargo (estrenado en el propio PR #19: dentro del presupuesto declarado). El escéptico tumbó 6 defectos de coherencia antes de la firma. Restan: S06 (en pausa hasta el primer veto real) y S04 (máquina del validador)."},
  {f:"2026-07-13 (5)", t:"Re-auditoría tras S05 (PR #17 mergeado = firma; v1.9.0 verificada en main). p-critic → verde (CLOSED_COUNT 6→7). Decisiones d6 (verificador: todo encargo salvo bookkeeping) y d7 (nada automergea por ahora) al ADR; DECISION_PENDS vacío — cero decisiones bloqueando. Evidencia fundacional de la v1.9: en su PR de estreno, el escéptico de contexto limpio tumbó 3 defectos reales del ejecutor. Cola restante: S04 (máquina del validador), S06 y S07 (desbloqueados)."},
  {f:"2026-07-13 (4)", t:"Re-auditoría tras S03 (PR #15 mergeado = firma; v1.8.1 verificada en main). p-fallback → verde (CLOSED_COUNT 5→6). Decisión d5 al registro ADR («la Fase 0 jamás bloquea»). El hallazgo en vivo de la primera corrida quedó convertido en regla del comando en el mismo día. Cola restante: S04 (humano), S05 y S07 (ambos con decisión ⚖️ previa del validador)."},
  {f:"2026-07-13 (3)", t:"Re-auditoría tras S02 (PR #13 mergeado por hifede1 = firma; ambas referencias verificadas EN CÓDIGO en main). p-ref-oh y p-ref-cc → verde (CLOSED_COUNT 3→5). Catálogo de Referencias poblado: 2 fichas 🟢 con triggers, 0 faltantes. README+CHANGELOG+referencias → ✅ HECHO (modo protección: la frescura es el nuevo riesgo). Zona Conocimiento completa."},
