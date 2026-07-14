@@ -30,7 +30,9 @@ contexto limpio encuentra lo que el autor no ve.
   sobrevivió.
 - **Evidencia propia**: el panel adversarial sobre este mismo plugin (2026-07-13, PR #1)
   tumbó 8 de 16 hallazgos plausibles — la separación autor/escéptico funciona.
-- **Decisión pendiente (⚖️)**: ¿obligatorio siempre o solo en encargos no triviales?
+- **Decisión tomada** (2026-07-13, validada por el dueño): obligatorio en TODO encargo salvo
+  los PRs de bookkeeping del tracker; se relaja con datos tras las primeras corridas.
+  Adoptado en v1.9 (paso 5 de /orquestar, verificación en dos actores).
 
 ## 2. Confirmation mode y ConfirmRisky — firma por riesgo ✦ para S07
 
@@ -77,6 +79,6 @@ insiste ≠ progreso.*
 |---|---|
 | Microagents/triggers | ✅ v1.8 |
 | Stuck detection | ✅ v1.8 |
-| Critic (verificador independiente) | ⏳ S05 (v1.9) |
+| Critic (verificador independiente) | ✅ v1.9 |
 | ConfirmRisky (firma por riesgo) + presupuesto | ⏳ S07 |
 | Event stream / resolver | ✅ equivalentes de diseño desde v1.1/v1.4 |

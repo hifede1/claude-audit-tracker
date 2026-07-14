@@ -2,6 +2,9 @@
 
 Formato: una entrada por versión del plugin. El detalle fino vive en los mensajes de commit.
 
+## v1.9.0 — 2026-07-13
+- **Verificador independiente** (inspirado en el critic model de OpenHands): la verificación del orquestador pasa a dos actores — el ejecutor hace su pasada y un escéptico de CONTEXTO LIMPIO (solo ficha + diff + repo) intenta refutar cada criterio; lo tumbado se corrige antes de pedir firma. El informe declara quién ejecutó, quién verificó, qué se intentó refutar y qué sobrevivió. Alcance (d6): todo encargo salvo bookkeeping. Sin subagentes disponibles, degradación DECLARADA (filosofía d5).
+
 ## v1.8.1 — 2026-07-13
 - **Fallback de calibración**: la Fase 0 jamás bloquea — si AskUserQuestion falla o no está disponible, se declaran defaults en texto (con su porqué), rigen hasta corrección del usuario y quedan visibles como calibración vigente en el tracker. Hallazgo en vivo de la primera corrida real (S03, issue #6).
 
