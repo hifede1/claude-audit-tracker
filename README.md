@@ -4,7 +4,7 @@ Tres comandos para gestionar el estado real de un proyecto, repartir el trabajo 
 
 - **`/audit-tracker`** — auditoría del estado **REAL** de construcción + **tracker vivo interactivo** para gestionar lo que falta.
 - **`/proximo-encargo`** — en cada máquina trabajadora: toma el siguiente encargo asignado (GitHub Issue), lo ejecuta y abre PR.
-- **`/orquestar`** — loop orquestado: el orquestador ejecuta los encargos él mismo, verifica en código contra los criterios de la ficha y pide tu firma (review del PR) antes de mergear.
+- **`/orquestar`** — loop orquestado: el orquestador ejecuta los encargos él mismo, verifica en código contra los criterios de la ficha y pide tu firma en el PR antes de mergear (default: todo se firma; podés marcar clases auto-mergeables en la calibración).
 
 ## Qué hace `/audit-tracker`
 
