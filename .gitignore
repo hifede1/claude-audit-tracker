@@ -1,1 +1,5 @@
 .DS_Store
+
+# Configuración personal de Claude Code (nunca se commitea)
+CLAUDE.local.md
+.claude/settings.local.json
