@@ -112,7 +112,7 @@
 <script>
 "use strict";
 /* ============ DATOS (editar SOLO esto en actualizaciones) ============ */
-const LAST_AUDIT = "2026-07-14 (corrida externa validada)";
+const LAST_AUDIT = "2026-07-16 (re-auditoría tras v1.11.0)";
 const CLOSED_COUNT = 9;
 const CALIB = { unidad:"sesiones (~2-4h)", actores:"fede (hifede1) + Claude — misma cuenta GitHub: firma = comentario «✅ validado» en el PR", met:"directa", loop:"orquestado (despacho activo)" };
 
@@ -137,9 +137,9 @@ const DATA = [
     refs:[]},
    pends:[]},
   {id:"b-orq", n:"/orquestar", st:"curso",
-   existe:"Spec completa y endurecida: 5 corridas verificadas (S01-S03, S05, S07), verificación en DOS ACTORES (v1.9, escéptico con 3+6 defectos tumbados en sus dos estrenos), blindaje anti-inyección, firma por riesgo con default todo-se-firma, y presupuesto por encargo con costo real en el informe (v1.10).",
+   existe:"Spec completa y endurecida: 5 corridas verificadas (S01-S03, S05, S07), verificación en DOS ACTORES (v1.9, escéptico con 3+6 defectos tumbados en sus dos estrenos), blindaje anti-inyección, firma por riesgo con default todo-se-firma, presupuesto por encargo con costo real en el informe (v1.10), y desde v1.11 snapshot local del loop (.claude/audit-tracker-state.json — cache de arranque, GitHub sigue siendo la verdad) que los hooks del plugin inyectan al arrancar sesión.",
    falta:"Ramas difíciles sin ejercitar (cambios pedidos, veto — que además es el prerrequisito de S06 —, silencio prolongado con reconciliación) y el post-mortem (S06).",
-   ev:"corridas: issues/4,5,6,8,10 con PRs 11,13,15,17,19 mergeados; escéptico: fixes a727eb3 y 1e58974; presupuesto estrenado en PR #19",
+   ev:"corridas: issues/4,5,6,8,10 con PRs 11,13,15,17,19 mergeados; escéptico: fixes a727eb3 y 1e58974; presupuesto estrenado en PR #19; snapshot+hooks: PR #22 (v1.11.0, mergeado por el validador 2026-07-16)",
    ficha:{plant:"El corazón de la visión: loop autónomo donde la máquina verifica y el humano valida. Todo el valor del plugin depende de que este ciclo funcione en la práctica, no en el texto.",
     met:["S01 es su primera corrida real con un encargo chico y de bajo riesgo (CI+CHANGELOG).","Provocar a propósito las ramas difíciles: cambios pedidos, veto (cerrar PR), silencio.","Después: verificador independiente (S05) y blindaje (S07)."],
     crit:["Un ciclo completo: issue → 🔒 → plan de ataque → PR con informe de verificación → «✅ validado» → merge → re-auditoría → verde","La rama veto y la rama cambios ejercitadas al menos una vez","Jamás mergea sin firma (verificado provocándolo)"],
@@ -149,21 +149,24 @@ const DATA = [
     ]}
  ]},
  {zona:"Distribución", blocks:[
-  {id:"b-dist", n:"Marketplace + manifiestos", st:"curso",
-   existe:"Estructura validada contra los docs oficiales de Claude Code; JSONs válidos (gate en verde); instalación documentada en README con alternativa curl.",
-   falta:"Nadie completó una instalación local end-to-end (el único intento fue en sesión web, donde los plugins no existen por diseño).",
-   ev:".claude-plugin/marketplace.json; plugins/audit-tracker/.claude-plugin/plugin.json; verificación vs code.claude.com/docs 2026-07-13",
-   ficha:{plant:"Si instalar falla o confunde, el plugin no existe para nadie más que este repo. El intento fallido en web ya enseñó que hay que documentar dónde NO funciona.",
-    met:["Instalación real en la máquina de fede: marketplace add → install → /reload-plugins → correr un comando.","Anotar cada fricción como troubleshooting en el README."],
-    crit:["/audit-tracker:audit-tracker responde en el CLI local tras instalar","Sección de troubleshooting en README con lo aprendido (web no soportado, /reload-plugins, namespace)"],
-    refs:[]},
-   pends:[{id:"p-install", txt:"Instalación local verificada + troubleshooting en README (requiere la máquina de fede)", ses:"S04", est:0.5}]}
+  {id:"b-dist", n:"Marketplace + manifiestos + hooks", st:"curso",
+   existe:"Estructura validada contra los docs oficiales de Claude Code; JSONs válidos (gate en verde); instalación documentada en README con alternativa curl. v1.11: el plugin suma lifecycle hooks (SessionStart + statusline opcional con nudge único, contrato never-block estilo ponytail) declarados vía campo hooks del manifiesto.",
+   falta:"Nadie completó una instalación local end-to-end (el único intento fue en sesión web, donde los plugins no existen por diseño). Los hooks v1.11 se probaron con entradas simuladas, nunca en sesión real del CLI.",
+   ev:".claude-plugin/marketplace.json; plugins/audit-tracker/.claude-plugin/plugin.json (v1.11.0); plugins/audit-tracker/hooks/ (hooks.json + 3 scripts Node, PR #22); verificación vs code.claude.com/docs 2026-07-13",
+   ficha:{plant:"Si instalar falla o confunde, el plugin no existe para nadie más que este repo. El intento fallido en web ya enseñó que hay que documentar dónde NO funciona. Con v1.11 se suma superficie ejecutable: los hooks tienen que ser invisibles cuando no hay snapshot y jamás frenar una sesión.",
+    met:["Instalación real en la máquina de fede: marketplace add → install → /reload-plugins → correr un comando.","Ejercitar los hooks en esa misma sesión: SessionStart inyecta el snapshot, la statusline muestra el badge, el nudge aparece UNA sola vez.","Anotar cada fricción como troubleshooting en el README."],
+    crit:["/audit-tracker:audit-tracker responde en el CLI local tras instalar","Hooks ejercitados en sesión real: contexto inyectado + badge + nudge único","Sección de troubleshooting en README con lo aprendido (web no soportado, /reload-plugins, namespace)"],
+    refs:["docs/references/ponytail.md"]},
+   pends:[
+    {id:"p-install", txt:"Instalación local verificada + troubleshooting en README (requiere la máquina de fede)", ses:"S04", est:0.5},
+    {id:"p-hooks-real", txt:"Hooks v1.11 ejercitados en sesión real del CLI (SessionStart, statusline, nudge único)", ses:"S04", est:0.5}
+   ]}
  ]},
  {zona:"Calidad", blocks:[
   {id:"b-ci", n:"Gates / CI del repo", st:"hecho",
-   existe:"validate.yml en main con los 3 gates (parseo de JSONs, estructura de comandos, node --check del tracker), corriendo en cada PR y push a main. Primera ejecución verde en el propio PR #11 (7s) y en main (run 29255030500). Test negativo verificado: JSON roto → el check falla.",
-   falta:"Nada. Mantenimiento: si aparece un artefacto ejecutable nuevo, sumar su gate al workflow.",
-   ev:".github/workflows/validate.yml; runs 86832347929 (PR) y 29255030500 (main), ambos verdes 2026-07-13",
+   existe:"validate.yml en main con 5 gates: los 3 originales (parseo de JSONs, estructura de comandos, node --check del tracker) + v1.11: node --check de hooks/scripts y check de consistencia marketplace↔plugin↔CHANGELOG↔hooks (scripts/check-consistency.js — detectó un drift REAL de descripciones en su estreno). Test negativo verificado: JSON roto → falla; versión sin CHANGELOG → falla.",
+   falta:"Nada. Mantenimiento: si aparece un artefacto ejecutable nuevo, sumar su gate al workflow (regla cumplida en v1.11: los hooks llegaron con sus gates).",
+   ev:".github/workflows/validate.yml; runs verdes 2026-07-13; ampliación v1.11 en PR #22, pasos corridos en local 2026-07-16",
    ficha:{plant:"CERRADO — modo protección. El workflow es la única defensa automática del repo: cualquier cambio que lo debilite deja los manifiestos sin red.",
     met:["No quitar ni relajar checks sin decisión registrada en ⚖️.","Antes de tocar el workflow: test negativo local (romper un JSON → el check debe fallar → restaurar).","Extraer el JS del tracker SIEMPRE por tag exacto ^<script>$ (el patrón laxo pesca la mención del comentario de cabecera)."],
     crit:["El workflow corre en cada PR nuevo","Los 3 checks siguen presentes"],
@@ -172,13 +175,13 @@ const DATA = [
  ]},
  {zona:"Conocimiento", blocks:[
   {id:"b-docs", n:"README + CHANGELOG + referencias propias", st:"hecho",
-   existe:"README sincronizado (panel adversarial v1.4 + greps por versión). CHANGELOG.md v1.0→v1.8 (S01). docs/references/ poblado: openhands-agentes.md y claude-code-plugins.md con frontmatter triggers, fuentes y fecha (S02, PR #13).",
+   existe:"README sincronizado (sección de hooks incluida). CHANGELOG.md v1.0→v1.11. docs/references/ poblado: openhands-agentes.md, claude-code-plugins.md (refrescada v1.11: anatomía con hooks) y ponytail.md (v1.11: arquitectura de hooks leída en código + qué se adoptó y qué se descartó con porqué) — todas con frontmatter triggers, fuentes y fecha.",
    falta:"Nada estructural. Mantenimiento: frescura de referencias (fecha vieja = drift) y troubleshooting del README llega con S04.",
-   ev:"CHANGELOG.md (9 entradas); docs/references/*.md verificados en main 2026-07-13 (merge 825c9ec)",
+   ev:"CHANGELOG.md (13 entradas, v1.11.0 arriba); docs/references/*.md verificados en main 2026-07-13 (merge 825c9ec) y 2026-07-16 (merge 2044ada)",
    ficha:{plant:"CERRADO — modo protección. El conocimiento del repo ya cumple su propia regla: destilado, con triggers, fuentes y fecha. El riesgo ahora es el envejecimiento silencioso.",
     met:["Cada versión nueva del plugin suma su entrada al CHANGELOG en el mismo PR.","Referencia con fecha vieja o contradicha por las fuentes → la re-auditoría la marca 🟠 pendiente de refresco.","Los ejecutores cargan estas referencias POR TRIGGER (regla v1.8) — no dependen de links manuales."],
-    crit:["CHANGELOG al día con la última versión","Ambas referencias con fecha vigente y sin contradicciones conocidas"],
-    refs:["docs/references/openhands-agentes.md","docs/references/claude-code-plugins.md"]},
+    crit:["CHANGELOG al día con la última versión (clavado por CI desde v1.11: check-consistency falla si divergen)","Las tres referencias con fecha vigente y sin contradicciones conocidas"],
+    refs:["docs/references/openhands-agentes.md","docs/references/claude-code-plugins.md","docs/references/ponytail.md"]},
    pends:[]}
  ]}
 ];
@@ -189,10 +192,10 @@ const DEBT = [
 ];
 
 const PLAN = [
- {s:"S04", t:"Instalación local verificada + troubleshooting", est:0.5, deps:[], badge:"humano + Claude",
-  obj:"Probar el camino marketplace→install→comando en la máquina de fede y documentar cada fricción.",
-  tareas:["Instalar en CLI local","README: sección troubleshooting (web no soportado, /reload-plugins, namespace)"],
-  cierra:["p-install"]},
+ {s:"S04", t:"Instalación local verificada + hooks reales + troubleshooting", est:1, deps:[], badge:"humano + Claude",
+  obj:"Probar el camino marketplace→install→comando en la máquina de fede, ejercitar los hooks v1.11 en esa sesión real, y documentar cada fricción.",
+  tareas:["Instalar en CLI local","Ejercitar los hooks: SessionStart inyecta snapshot, statusline con badge, nudge UNA sola vez","README: sección troubleshooting (web no soportado, /reload-plugins, namespace)"],
+  cierra:["p-install","p-hooks-real"]},
  {s:"S05", t:"Verificador independiente (v1.9)", est:1, deps:[], badge:"directo · S01 y S02 ✓ cumplidos",
   obj:"Separar ejecutor de verificador: un escéptico con contexto limpio intenta refutar el cierre antes de pedir la firma.",
   tareas:["Diseñar el paso de verificación como agente/lente independiente en orquestar.md","El informe declara quién verificó y qué intentó refutar"],
@@ -204,6 +207,7 @@ const PLAN = [
 ];
 
 const CHANGELOG = [
+ {f:"2026-07-16", t:"Re-auditoría tras v1.11.0 (PR #22 mergeado por el validador = firma). Encargo ad hoc nacido de investigar ponytail (~84k ⭐, código leído — no solo el README): el plugin gana lifecycle hooks — /orquestar mantiene un snapshot local del loop (.claude/audit-tracker-state.json, cache de arranque: GitHub sigue siendo la verdad, coherente con d1) que SessionStart inyecta al arrancar sesión, más statusline opcional con nudge único; contrato never-block heredado (timeout de stdin, BOM strip, fail silencioso, allowlist de paths). CI ampliado a 5 gates: node --check de hooks/scripts + check de consistencia que detectó un drift REAL en su estreno (descripción marketplace≠plugin, corregido). Tercera referencia: ponytail.md, con los descartes deliberados (skills auto-activables, SubagentStart, UserPromptSubmit) → decisión d8. Drift interno de este tracker corregido: el Stack decía v1.8.0, «sin CI» y «orquestar dormant». Pendiente nuevo p-hooks-real (S04): los hooks se probaron con entradas simuladas, falta la sesión real del CLI."},
  {f:"2026-07-14 (2)", t:"CORRIDA EXTERNA VALIDADA por el dueño → /audit-tracker (b-audit) pasa a ✅ HECHO. Primera ejecución real en proyecto ajeno al plugin: nuecesmecohue (e-commerce con Supabase en producción). Cubrió lo que el dogfooding no podía: calibración con AskUserQuestion real (4 preguntas, funcionó), verificación contra base viva (9 negativos exactos, 44/58 divergentes — el tracker heredado resultó veraz), retoma de tracker HEREDADO de otra sesión (URL respetada vía parámetro url), despacho de 8 encargos, y ESTRENO del automerge por umbral de riesgo (PR #9, clase docs, CI verde): la v1.10 funcionando en el mundo real el mismo día que se escribió. Los 3 comandos quedan ✅; el sistema entero queda en modo protección + evolución (S04 instalación local, S06 espera veto)."},
  {f:"2026-07-14", t:"Re-auditoría tras S07 (PR #19 mergeado = firma; v1.10.0 verificada en main). p-inject y p-risk → verde (CLOSED_COUNT 7→9). El loop quedó endurecido: blindaje anti-inyección (con manejo de 🔒 sospechosos), firma por riesgo (default d7: nada automergea) y presupuesto por encargo (estrenado en el propio PR #19: dentro del presupuesto declarado). El escéptico tumbó 6 defectos de coherencia antes de la firma. Restan: S06 (en pausa hasta el primer veto real) y S04 (máquina del validador)."},
  {f:"2026-07-13 (5)", t:"Re-auditoría tras S05 (PR #17 mergeado = firma; v1.9.0 verificada en main). p-critic → verde (CLOSED_COUNT 6→7). Decisiones d6 (verificador: todo encargo salvo bookkeeping) y d7 (nada automergea por ahora) al ADR; DECISION_PENDS vacío — cero decisiones bloqueando. Evidencia fundacional de la v1.9: en su PR de estreno, el escéptico de contexto limpio tumbó 3 defectos reales del ejecutor. Cola restante: S04 (máquina del validador), S06 y S07 (desbloqueados)."},
@@ -229,6 +233,11 @@ const DECISIONS = [
   ops:"(a) doble firma · (b) tracker directo a default · (c) PR de tracker automergeado como contabilidad de un cierre ya firmado",
   por:"La regla «jamás sin firma» protege el código del proyecto, no su contabilidad. (b) violaba la regla de rama+PR.",
   cons:"El PR del tracker no cuenta para el cupo de 3; agrupable al final de la corrida."},
+ {id:"d8", t:"Estado entre sesiones: hooks de solo-lectura + snapshot como cache; skills auto-activables descartadas", st:"tomada", f:"2026-07-16 (v1.11)",
+  ctx:"La investigación de ponytail ofrecía tres mecanismos adoptables (hooks de lifecycle, skills auto-activables por descripción, inyección en subagentes). ¿Cuáles calzan en un plugin cuyos comandos son workflows pesados y con efectos (mergear PRs, publicar issues, fan-out de agentes)?",
+  ops:"(a) adoptar el stack completo de ponytail: skills auto-activables + hooks + SubagentStart · (b) solo hooks de LECTURA: snapshot local como cache de arranque, GitHub sigue siendo la verdad, invocación por slash siempre",
+  por:"Que «seguí con el siguiente encargo» pueda autodisparar un loop que mergea PRs es un anti-feature, no una comodidad; y un snapshot autoritativo duplicaría el estado que ya vive en GitHub (contradiría d1). Los tres descartes quedan documentados con su porqué en ponytail.md.",
+  cons:"El snapshot jamás decide (la reconciliación del paso 1 manda siempre y un snapshot roto no frena nada); hooks invisibles sin snapshot; SubagentStart se reevalúa solo si aparece evidencia de subagentes clasificando distinto que el orquestador."},
  {id:"d7", t:"Umbral de firma por riesgo: por ahora NADA automergea", st:"tomada", f:"2026-07-13 (para S07)",
   ctx:"S07 construirá el mecanismo de firma selectiva; había que fijar el umbral inicial antes de codificar.",
   ops:"(a) automerge para docs/tests desde el día uno · (b) todo se firma, y el umbral se afloja tras ~10 corridas con datos",
@@ -257,21 +266,25 @@ const TESTS = {
   {n:"JSON de manifiestos", cmd:"CI validate.yml — automatizado en cada PR y push a main (antes: a mano)", st:"grn", f:"2026-07-13"},
   {n:"Estructura del plugin (3 comandos)", cmd:"CI validate.yml — automatizado", st:"grn", f:"2026-07-13"},
   {n:"Sintaxis JS del tracker", cmd:"CI validate.yml (node --check, extracción por tag exacto) + obligatorio antes de cada deploy", st:"grn", f:"2026-07-13"},
-  {n:"Consistencia README↔comandos", cmd:"greps manuales tras cada edición — SIN automatizar (candidato a sumarse al CI)", st:"amb", f:"2026-07-13"}
+  {n:"Sintaxis JS de hooks y scripts", cmd:"CI validate.yml — node --check de plugins/audit-tracker/hooks/*.js y scripts/*.js (v1.11)", st:"grn", f:"2026-07-16"},
+  {n:"Consistencia marketplace↔plugin↔CHANGELOG↔hooks", cmd:"CI scripts/check-consistency.js (v1.11) — detectó un drift real de descripciones en su estreno", st:"grn", f:"2026-07-16"},
+  {n:"Consistencia README↔comandos", cmd:"greps manuales tras cada edición — la parte de manifiestos ya se automatizó (check-consistency); la PROSA sigue a mano", st:"amb", f:"2026-07-16"}
  ],
  flujos:[
   {n:"Auditar → informe → tracker → despacho", st:"amb", note:"Ejercitado UNA vez (hoy) y parcial: calibración degradada por fallo de AskUserQuestion. Sin test que lo clave."},
   {n:"Issue → /orquestar → PR+informe → firma → merge → re-auditoría", st:"amb", note:"Ejercitado UNA vez completo (issue #4 → PR #11, firma por merge del validador, CI verde, 2026-07-13). Sin automatización que lo clave; las ramas cambios/veto/silencio siguen sin ejercitar."},
   {n:"Marketplace → install → comando responde", st:"red", note:"Único intento en sesión web (no soportado por diseño). Local pendiente → S04."},
-  {n:"/proximo-encargo toma de la cola respetando reclamos", st:"red", note:"Sin cola hasta hoy. Se ejercita con el despacho de este plan."}
+  {n:"/proximo-encargo toma de la cola respetando reclamos", st:"red", note:"Sin cola hasta hoy. Se ejercita con el despacho de este plan."},
+  {n:"Snapshot → SessionStart inyecta contexto / statusline muestra badge", st:"amb", note:"Probado con entradas simuladas (con snapshot, sin snapshot, JSON corrupto, sin stdin, nudge único — 2026-07-16). Sin sesión real del CLI → S04 (p-hooks-real)."}
  ],
- deuda:"Lo estructural quedó clavado por el CI (validate.yml, desde S01). Los criterios de comportamiento de los comandos siguen siendo prosa: se clavan con corridas reales documentadas — el loop ya tiene UNA (issue #4/PR #11); faltan las ramas difíciles y la instalación local (S04)."
+ deuda:"Lo estructural quedó clavado por el CI (validate.yml, desde S01; ampliado en v1.11 con sintaxis de hooks y consistencia de manifiestos). Los criterios de comportamiento de los comandos siguen siendo prosa: se clavan con corridas reales documentadas — el loop ya tiene UNA (issue #4/PR #11); faltan las ramas difíciles, la instalación local y los hooks en sesión real (S04)."
 };
 
 const REFS = {
  items:[
   {tema:"openhands-agentes", trg:["orquestador","critic","verificador","confirmation mode","microagents","stuck detection","firma por riesgo","presupuesto","loop autónomo"], f:"2026-07-13", usa:"S05 (critic) · S07 (ConfirmRisky/presupuesto) · adopciones v1.8 documentadas (triggers, freno anti-loop)"},
-  {tema:"claude-code-plugins", trg:["plugin","marketplace","instalación","comandos","namespace","reload","distribución"], f:"2026-07-13", usa:"S04 (instalación local) · cualquier evolución del empaquetado"}
+  {tema:"claude-code-plugins", trg:["plugin","marketplace","instalación","comandos","namespace","reload","distribución"], f:"2026-07-16 (refrescada: anatomía con hooks)", usa:"S04 (instalación local) · cualquier evolución del empaquetado"},
+  {tema:"ponytail", trg:["hooks","statusline","lifecycle","snapshot","estado","never-block","yagni","skills","subagentes","consistencia","CI"], f:"2026-07-16", usa:"hooks v1.11 (b-dist, b-orq) · check-consistency (b-ci) · decisión d8 · S04 (p-hooks-real)"}
  ],
  faltantes:[],
  nota:"docs/business/ no aplica: este repo ES la herramienta; su «negocio» son los comandos."
@@ -288,9 +301,9 @@ const MAPA = [
 ];
 
 const STACK = [
- {capa:"Comandos (el producto)", items:"3 prompts markdown: audit-tracker · proximo-encargo · orquestar", warn:"orquestar: dormant — 0 ejecuciones"},
- {capa:"Distribución", items:"marketplace.json (fede-tools) + plugin.json (v1.8.0) · instala vía CLI local", warn:"no funciona en sesiones web (por diseño de Claude Code)"},
- {capa:"Runtime del loop", items:"Claude Code + gh · GitHub Issues (cola) · PRs (validación) · comentarios (rastro)", warn:"sin CI propio que proteja los manifiestos"},
+ {capa:"Comandos (el producto)", items:"3 prompts markdown: audit-tracker · proximo-encargo · orquestar", warn:"proximo-encargo sin corrida real; ramas cambios/veto/silencio del loop sin ejercitar"},
+ {capa:"Distribución", items:"marketplace.json (fede-tools) + plugin.json (v1.11.0) · hooks Node (SessionStart + statusline, never-block) · instala vía CLI local", warn:"no funciona en sesiones web (por diseño de Claude Code) — hooks incluidos"},
+ {capa:"Runtime del loop", items:"Claude Code + gh · GitHub Issues (cola) · PRs (validación) · comentarios (rastro) · snapshot local .claude/audit-tracker-state.json (cache de arranque para los hooks)", warn:"CI protege manifiestos/sintaxis/consistencia; el COMPORTAMIENTO de comandos y hooks se clava con corridas reales"},
  {capa:"Artefacto", items:"este tracker HTML autocontenido · ticks en localStorage", warn:"ticks viven en UN navegador; verde solo vía re-auditoría"}
 ];
 const RECORRIDOS = [
