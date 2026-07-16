@@ -32,6 +32,15 @@ Con `/orquestar`, el ciclo completo lo corre el orquestador y el humano queda so
 
 La cola de validación vive en GitHub, no en ticks del tracker: el equivalente del ámbar es el **PR esperando tu firma** (verificado por la máquina, sin validar); al mergear, el tracker pasa el ítem directo a **verde**. El PR que actualiza el propio tracker es bookkeeping de un cierre ya firmado y el orquestador lo automergea.
 
+### Estado entre sesiones (hooks del plugin)
+
+`/orquestar` deja un snapshot local del loop en `.claude/audit-tracker-state.json` del proyecto (gitignoreado; cache de arranque — la fuente de verdad sigue siendo GitHub). El plugin trae dos hooks que lo aprovechan en el CLI local (los plugins no cargan en sesiones web):
+
+- **SessionStart**: al arrancar una sesión en el proyecto, inyecta qué encargo está en curso, qué PRs esperan tu firma y qué quedó escalado — la sesión no arranca ciega.
+- **Statusline opcional**: badge tipo `[Opus] · mi-proyecto · 🎼 #12 S07 en curso · ⏳ 2 PRs esperando firma`. El propio hook te lo ofrece UNA vez (con el path exacto ya resuelto) si no tenés statusline configurada; también podés apuntar `statusLine` de `~/.claude/settings.json` a `node "<plugin>/hooks/statusline.js"` a mano.
+
+Los hooks necesitan `node` en el PATH y siguen el contrato *never-block*: sin snapshot no emiten nada, y un hook roto jamás frena la sesión.
+
 ## Instalación
 
 Dentro de Claude Code:

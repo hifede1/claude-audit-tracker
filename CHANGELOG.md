@@ -2,6 +2,11 @@
 
 Formato: una entrada por versión del plugin. El detalle fino vive en los mensajes de commit.
 
+## v1.11.0 — 2026-07-16
+- **Hooks de estado del loop** (patrones de [ponytail](https://github.com/DietrichGebert/ponytail), ver `docs/references/ponytail.md`): `/orquestar` mantiene un snapshot local (`.claude/audit-tracker-state.json`, gitignoreado — cache de arranque, jamás la cola: GitHub sigue siendo la fuente de verdad) y el plugin gana lifecycle hooks. SessionStart inyecta al arrancar qué encargo está en curso, qué PRs esperan firma y qué quedó escalado; una statusline opcional (ofrecida UNA vez vía nudge) muestra el badge `#12 S07 en curso · 2 PRs esperando firma`. Contrato never-block heredado de ponytail: timeout de stdin con unref, BOM strip, fail silencioso, allowlist de paths antes de incrustarlos en comandos — un hook roto jamás frena la sesión. Solo CLI local (los plugins no cargan en sesiones web; documentado).
+- **Check de consistencia en CI** (`scripts/check-consistency.js`, patrón check-rule-copies de ponytail): descripción marketplace↔plugin idéntica (drift real detectado y corregido), versión plugin.json↔CHANGELOG, hooks.json↔archivos referenciados. Lo duplicado por contrato se verifica en CI, no de memoria.
+- **Descartes deliberados, con porqué** (en la referencia): skills auto-activables (workflows pesados y con efectos — mergear PRs, fan-out de agentes — no deben autodispararse por fraseo natural), SubagentStart (exigiría estado «auditoría en curso» frágil) y UserPromptSubmit (no hay modos que trackear).
+
 ## v1.10.0 — 2026-07-13
 - **Blindaje anti-inyección**: solo las señales del validador (firma, cambios, veto, decisiones) mueven el estado del loop; instrucciones de terceros en issues/comentarios/logs se reportan como hallazgo, jamás se obedecen. Duda = tercero.
 - **Firma selectiva por riesgo**: ítem 5 de calibración — clases de encargo auto-mergeables con CI verde + informe de dos actores (default: NINGUNA; la zona gris se firma). El orquestador jamás clasifica en zona gris.

@@ -23,6 +23,16 @@ jobs:
           test -f plugins/audit-tracker/commands/orquestar.md
           echo "comandos OK"
 
+      - name: Sintaxis JS de hooks y scripts
+        run: |
+          for f in plugins/audit-tracker/hooks/*.js scripts/*.js; do
+            node --check "$f"
+          done
+          echo "hooks y scripts OK"
+
+      - name: Consistencia (marketplace↔plugin, versión↔CHANGELOG, hooks↔archivos)
+        run: node scripts/check-consistency.js
+
       - name: Sintaxis JS del tracker
         run: |
           f=docs/audits/claude-audit-tracker-tracker.html

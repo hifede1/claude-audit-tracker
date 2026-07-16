@@ -42,7 +42,27 @@ El ciclo grande lo cierra el loop: verificación contra los ✅ criterios (paso 
 
 Como vos verificaste y el humano validó (firma directa, o clase auto-mergeable que él mismo definió en la calibración), podés re-auditar al momento con el protocolo de `/audit-tracker` Fase 3: ítem a verde, CLOSED_COUNT, CHANGELOG, redeploy a LA MISMA URL, y commit del tracker en rama + PR. **Excepción de bookkeeping**: ese PR del tracker solo refleja un cierre YA firmado — podés mergearlo vos sin pedir otra firma, y no cuenta para el cupo de 3. La regla «jamás mergear sin firma» protege el código del proyecto, no su contabilidad. Si hay varios cierres seguidos, podés agruparlos en un solo PR de tracker al final de la corrida.
 
-**Dónde vive el estado del loop**: la cola de validación son los PRs abiertos esperando firma — en GitHub, no en ticks del tracker (el artifact no tiene backend y sus ticks ámbar viven en el navegador del usuario). El tracker pasa el ítem directo a verde al cerrar el ciclo; el equivalente orquestado del ámbar es el PR esperando firma: verificado por la máquina, sin validar por el humano.
+**Dónde vive el estado del loop**: la cola de validación son los PRs abiertos esperando firma — en GitHub, no en ticks del tracker (el artifact no tiene backend y sus ticks ámbar viven en el navegador del usuario). El tracker pasa el ítem directo a verde al cerrar el ciclo; el equivalente orquestado del ámbar es el PR esperando firma: verificado por la máquina, sin validar por el humano. Además del estado real en GitHub, mantené el **snapshot local** que leen los hooks del plugin (sección siguiente).
+
+## Snapshot local de estado (lo leen los hooks del plugin)
+
+Mantené un snapshot del loop en `.claude/audit-tracker-state.json` del repo del proyecto. Lo consumen los hooks del plugin en el CLI local: el hook de SessionStart lo inyecta al arrancar una sesión (la sesión no arranca ciega) y la statusline opcional muestra el badge (`#12 S07 en curso · 2 PRs esperando firma`). Es **cache de arranque, no la cola**: jamás decidas con el snapshot — la reconciliación del paso 1 contra GitHub manda siempre, y un snapshot roto, viejo o ausente NUNCA frena el loop (se regenera en la próxima escritura).
+
+- **Cuándo escribirlo**: en cada transición — al reclamar (paso 3), al abrir el PR y pedir firma (paso 6), al reaccionar a una señal (paso 7: firma/merge, cambios pedidos, escalada, veto, liberación) y al cerrar la corrida (paso 8, con `nota` de por qué paró).
+- **Formato** (claves estables; omití las listas vacías):
+
+```json
+{
+  "actualizado": "<ISO 8601>",
+  "encargos_en_curso": [{ "issue": 12, "sesion": "S07", "titulo": "..." }],
+  "prs_esperando_firma": [{ "pr": 14, "issue": 12, "titulo": "..." }],
+  "escalados": [{ "issue": 9, "motivo": "..." }],
+  "nota": "una línea sobre cómo quedó la corrida"
+}
+```
+
+- **No se commitea**: verificá que `.claude/audit-tracker-state.json` esté en el `.gitignore` del proyecto (agregalo si falta) — es estado local de UNA máquina, no del repo.
+- En sesiones web/remotas los plugins (y sus hooks) no cargan: ahí el snapshot no se inyecta solo — leelo vos al arrancar si existe, y mantenelo igual (la próxima sesión CLI lo aprovecha).
 
 ## Reglas de oro
 
