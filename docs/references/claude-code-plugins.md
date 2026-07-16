@@ -18,14 +18,20 @@ fuentes:
 <repo marketplace>
 ├── .claude-plugin/marketplace.json        ← catálogo: {name, owner, plugins:[{name, source, description}]}
 └── plugins/<plugin>/
-    ├── .claude-plugin/plugin.json         ← manifiesto: {name, version, description, ...}
-    └── commands/*.md                      ← comandos slash (auto-descubiertos)
+    ├── .claude-plugin/plugin.json         ← manifiesto: {name, version, description, hooks?, ...}
+    ├── commands/*.md                      ← comandos slash (auto-descubiertos)
+    └── hooks/hooks.json + *.js            ← lifecycle hooks (declarados vía "hooks" del manifiesto)
 ```
 
 - El **nombre del marketplace** sale del `name` de `marketplace.json` (aquí: `fede-tools`) —
   es lo que va después de la `@` al instalar.
 - `commands/` y `skills/` se descubren solos; no hay que declararlos en el manifiesto.
-- El CI del repo (validate.yml, desde S01) protege ambos JSON y la existencia de los comandos.
+  Los **hooks** sí se declaran: campo `"hooks": "./hooks/hooks.json"` en plugin.json; los
+  comandos del hook referencian sus scripts vía `${CLAUDE_PLUGIN_ROOT}` (desde v1.11.0,
+  patrón tomado de ponytail — ver `ponytail.md`).
+- El CI del repo (validate.yml, desde S01) protege ambos JSON, la existencia de los
+  comandos y (desde v1.11.0) la sintaxis de los hooks + la consistencia
+  marketplace↔plugin↔CHANGELOG (`scripts/check-consistency.js`).
 
 ## Instalación (flujo exacto)
 
