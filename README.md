@@ -6,6 +6,16 @@ Tres comandos para gestionar el estado real de un proyecto, repartir el trabajo 
 - **`/proximo-encargo`** — en cada máquina trabajadora: toma el siguiente encargo asignado (GitHub Issue), lo ejecuta y abre PR.
 - **`/orquestar`** — loop orquestado: el orquestador ejecuta los encargos él mismo, verifica en código contra los criterios de la ficha y pide tu firma en el PR antes de mergear (default: todo se firma; podés marcar clases auto-mergeables en la calibración).
 
+## Herramienta hermana: doc-arquitecto
+
+El audit-tracker audita la **obra** (el código) contra la documentación del proyecto — pero es tan bueno como esa documentación: si el plano está incompleto, contradictorio o con criterios no verificables, audita contra un plano roto. [**`doc-arquitecto`**](https://github.com/hifede1/claude-doc-arquitecto) es su hermana: produce y audita ese **plano** (la documentación-contrato) para que el audit-tracker lo consuma **sin traducción**. Se instalan juntas desde el marketplace `fede-tools` y cierran el ciclo completo:
+
+```
+/documentar  →  /auditar-docs  →  código (encargos)  →  /audit-tracker
+(escribir el plano) (auditar el plano)  (construir)        (auditar la obra)
+└──────── doc-arquitecto ────────┘     └────── audit-tracker ──────┘
+```
+
 ## Qué hace `/audit-tracker`
 
 1. **Audita** el proyecto contra su plan/documentación: lanza agentes en paralelo que inspeccionan el código real (no lo que dicen los docs), corren los gates (typecheck, tests, lint) y clasifican cada bloque como ✅ HECHO / 🟠 EN CURSO / ⚪ PENDIENTE / ⚠️ MAQUETA — con evidencia `file:line`. El drift doc↔código es hallazgo de primera clase.
