@@ -78,6 +78,16 @@ curl -fsSL https://raw.githubusercontent.com/hifede1/claude-audit-tracker/main/p
   -o ~/.claude/commands/orquestar.md
 ```
 
+## Troubleshooting
+
+Fricciones reales de la primera instalación end-to-end verificada (2026-07-18):
+
+- **«Duplicate hooks file detected» / el plugin no carga** — corregido en **v1.11.1**. La v1.11.0 declaraba `"hooks": "./hooks/hooks.json"` en el manifiesto, pero Claude Code **auto-carga** ese archivo desde su ubicación estándar → doble carga → `Status: ✘ failed to load`. Si instalaste v1.11.0, actualizá a v1.11.1 (`claude plugin update audit-tracker@fede-tools` + reiniciá la sesión).
+- **Los plugins no cargan en sesiones web** (por diseño de Claude Code, no del plugin). Workaround: copiá los comandos a `~/.claude/commands/` con los `curl` de «Alternativa sin plugin». Por esta vía los hooks no funcionan.
+- **Comandos namespaceados**: si otro plugin define un comando homónimo, invocá `/audit-tracker:audit-tracker` (no `/audit-tracker` a secas).
+- **La caché no se refresca sola**: tras un release, `claude plugin update audit-tracker@fede-tools` (o `claude plugin marketplace update fede-tools`). Los comandos se cargan al INICIO de la sesión — el CLI avisa «Restart to apply changes»: reiniciá, porque una sesión abierta sigue sirviendo la versión vieja.
+- **Repo privado**: `claude plugin marketplace add` de un repo privado necesita autenticación (token de `gh`); si ves `repository not found` con el repo existiendo, revisá que la cuenta de `gh` activa tenga acceso. Este repo es público → instala sin auth.
+
 ## Uso
 
 ```

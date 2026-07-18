@@ -2,6 +2,10 @@
 
 Formato: una entrada por versión del plugin. El detalle fino vive en los mensajes de commit.
 
+## v1.11.1 — 2026-07-18
+- **Fix de carga (regresión de v1.11.0)**: el manifiesto declaraba `"hooks": "./hooks/hooks.json"`, pero Claude Code auto-carga ese archivo desde su ubicación estándar → «Duplicate hooks file detected» → el plugin **fallaba al cargar** en una instalación limpia. Nadie lo había visto porque nadie hizo el install end-to-end (era el pendiente `p-hooks-real`). Removida la referencia del manifiesto; los hooks se siguen auto-cargando. Verificado: instalación en config aislada da `Status: ✔ enabled`.
+- **README — sección Troubleshooting** basada en fricciones REALES de la primera instalación verificada (S04, encargo #7): duplicate hooks, sesiones web, namespace, caché/reinicio, repo privado.
+
 ## v1.11.0 — 2026-07-16
 - **Hooks de estado del loop** (patrones de [ponytail](https://github.com/DietrichGebert/ponytail), ver `docs/references/ponytail.md`): `/orquestar` mantiene un snapshot local (`.claude/audit-tracker-state.json`, gitignoreado — cache de arranque, jamás la cola: GitHub sigue siendo la fuente de verdad) y el plugin gana lifecycle hooks. SessionStart inyecta al arrancar qué encargo está en curso, qué PRs esperan firma y qué quedó escalado; una statusline opcional (ofrecida UNA vez vía nudge) muestra el badge `#12 S07 en curso · 2 PRs esperando firma`. Contrato never-block heredado de ponytail: timeout de stdin con unref, BOM strip, fail silencioso, allowlist de paths antes de incrustarlos en comandos — un hook roto jamás frena la sesión. Solo CLI local (los plugins no cargan en sesiones web; documentado).
 - **Check de consistencia en CI** (`scripts/check-consistency.js`, patrón check-rule-copies de ponytail): descripción marketplace↔plugin idéntica (drift real detectado y corregido), versión plugin.json↔CHANGELOG, hooks.json↔archivos referenciados. Lo duplicado por contrato se verifica en CI, no de memoria.
