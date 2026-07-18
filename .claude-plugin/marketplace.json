@@ -13,7 +13,7 @@
       "name": "doc-arquitecto",
       "source": {
         "source": "git-subdir",
-        "url": "hifede1/claude-doc-arquitecto",
+        "url": "https://github.com/hifede1/claude-doc-arquitecto.git",
         "path": "plugins/doc-arquitecto",
         "ref": "main"
       },
