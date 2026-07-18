@@ -68,6 +68,6 @@ audit-tracker.
 ## Instalación
 
 ```
-/plugin marketplace add hifede1/claude-doc-arquitecto
+/plugin marketplace add hifede1/claude-audit-tracker
 /plugin install doc-arquitecto@fede-tools
 ```

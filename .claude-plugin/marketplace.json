@@ -8,6 +8,16 @@
       "name": "audit-tracker",
       "source": "./plugins/audit-tracker",
       "description": "Auditoría del estado REAL de construcción de un proyecto + tracker vivo interactivo (artifact) con fichas de trabajo, plan de sesiones, mapa de flujo, registro de decisiones, mapa de evidencia de tests, catálogo de referencias, ciclo de re-auditoría, modo despacho multi-máquina vía GitHub Issues y modo orquestado: loop autónomo que ejecuta encargos y pide validación humana en el PR."
+    },
+    {
+      "name": "doc-arquitecto",
+      "source": {
+        "source": "git-subdir",
+        "url": "hifede1/claude-doc-arquitecto",
+        "path": "plugins/doc-arquitecto",
+        "ref": "main"
+      },
+      "description": "Produce y audita la documentación de un proyecto para que sea un contrato completo, coherente y verificable — el plano que el audit-tracker necesita para auditar la obra. /documentar: entrevista guiada (modo nuevo) o completado de huecos con diffs confirmados (modo existente). /auditar-docs: audita el plano mismo — completitud, contradicciones, criterios no verificables, decisiones sin registrar, referencias vencidas y drift doc↔doc."
     }
   ]
 }

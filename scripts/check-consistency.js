@@ -20,12 +20,44 @@ function read(p) {
 const marketplace = JSON.parse(read('.claude-plugin/marketplace.json'));
 const plugin = JSON.parse(read(path.join(PLUGIN_DIR, '.claude-plugin/plugin.json')));
 
-// 1. marketplace ↔ plugin
-const entry = (marketplace.plugins || []).find((p) => p.name === plugin.name);
-if (!entry) {
+// 1. marketplace ↔ plugins: recorre TODAS las entradas del catálogo.
+//    - source local (string "./..."): valida name + description contra su plugin.json local.
+//    - source externo (objeto git-subdir): no se puede leer el plugin.json remoto acá, así que
+//      solo se valida que el source esté bien formado (url/path presentes; ref/sha son opcionales).
+//    La description de entradas externas no se coteja contra su fuente en este CI (vive en otro repo).
+const plugins = marketplace.plugins || [];
+if (!plugins.some((p) => p.name === plugin.name)) {
   errors.push('marketplace.json no lista un plugin llamado "' + plugin.name + '"');
-} else if (entry.description !== plugin.description) {
-  errors.push('description driftada entre marketplace.json y plugin.json — tienen que ser idénticas');
+}
+for (const entry of plugins) {
+  if (typeof entry.source === 'string') {
+    const localDir = entry.source.replace(/^\.\//, '');
+    const manifestPath = path.join(localDir, '.claude-plugin/plugin.json');
+    let localPlugin;
+    try {
+      localPlugin = JSON.parse(read(manifestPath));
+    } catch (e) {
+      errors.push('entrada "' + entry.name + '": no pude leer su plugin.json local (' + manifestPath + '): ' + e.message);
+      continue;
+    }
+    if (entry.name !== localPlugin.name) {
+      errors.push('entrada "' + entry.name + '": name driftado vs su plugin.json (' + localPlugin.name + ')');
+    }
+    if (entry.description !== localPlugin.description) {
+      errors.push('entrada "' + entry.name + '": description driftada entre marketplace.json y su plugin.json — tienen que ser idénticas');
+    }
+  } else if (entry.source && typeof entry.source === 'object') {
+    const s = entry.source;
+    if (s.source === 'git-subdir') {
+      for (const key of ['url', 'path']) {
+        if (!s[key]) errors.push('entrada externa "' + entry.name + '" (git-subdir): falta o vacío source.' + key);
+      }
+    } else {
+      errors.push('entrada externa "' + entry.name + '": source.source no soportado por este check ("' + s.source + '"; esperado git-subdir)');
+    }
+  } else {
+    errors.push('entrada "' + entry.name + '": source ausente o de tipo no soportado');
+  }
 }
 
 // 2. versión ↔ CHANGELOG (la entrada más reciente es la primera "## vX.Y.Z")

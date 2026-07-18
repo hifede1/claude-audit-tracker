@@ -31,7 +31,11 @@ fuentes:
   patrón tomado de ponytail — ver `ponytail.md`).
 - El CI del repo (validate.yml, desde S01) protege ambos JSON, la existencia de los
   comandos y (desde v1.11.0) la sintaxis de los hooks + la consistencia
-  marketplace↔plugin↔CHANGELOG (`scripts/check-consistency.js`).
+  marketplace↔plugin↔CHANGELOG (`scripts/check-consistency.js`). El check recorre **todas**
+  las entradas del catálogo: las de source local se validan `name`/`description` contra su
+  `plugin.json`; las externas (`git-subdir`, p.ej. `doc-arquitecto` → otro repo) se validan
+  solo en la forma del `source` (`url`/`path` presentes) — su `description` NO se coteja
+  contra la fuente remota, que vive en otro repo y no se lee en este CI.
 
 ## Instalación (flujo exacto)
 
