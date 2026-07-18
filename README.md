@@ -58,6 +58,7 @@ Dentro de Claude Code:
 ```
 /plugin marketplace add hifede1/claude-audit-tracker
 /plugin install audit-tracker@fede-tools
+/plugin install doc-arquitecto@fede-tools
 ```
 
 O desde la terminal:
@@ -65,7 +66,10 @@ O desde la terminal:
 ```bash
 claude plugin marketplace add hifede1/claude-audit-tracker
 claude plugin install audit-tracker@fede-tools --scope user
+claude plugin install doc-arquitecto@fede-tools --scope user
 ```
+
+> Un solo `marketplace add hifede1/claude-audit-tracker` habilita el marketplace `fede-tools` con **ambos** plugins (`audit-tracker` local y `doc-arquitecto` vía `git-subdir`); después instalás cada uno con su propio `install`.
 
 ### Alternativa sin plugin (copia manual)
 
