@@ -30,7 +30,7 @@ jobs:
           done
           echo "hooks y scripts OK"
 
-      - name: Consistencia (marketplace↔plugin, versión↔CHANGELOG, hooks↔archivos)
+      - name: Consistencia (marketplace↔plugin, versión↔CHANGELOG, hooks↔archivos, estado.json↔tracker)
         run: node scripts/check-consistency.js
 
       - name: Sintaxis JS del tracker
