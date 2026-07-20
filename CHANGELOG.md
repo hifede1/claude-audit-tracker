@@ -2,6 +2,11 @@
 
 Formato: una entrada por versión del plugin. El detalle fino vive en los mensajes de commit.
 
+## v1.12.0 — 2026-07-20
+- **Estado consumible por máquinas (`docs/audits/<proyecto>-estado.json`)**: `/audit-tracker` ahora emite, junto al tracker HTML, una proyección JSON versionada del estado auditado (`schema_version` semver, bloques con estado, plan, pendientes, decisiones pendientes, referencias, deuda). Pedido por `batuta` (issue #31): su fase `analizar` necesita **leer el estado real sin re-auditar**, y hasta ahora la única superficie era parsear las constantes JS embebidas en el HTML — frágil y sin contrato. Ahora hay contrato declarado en `docs/estado-contrato.md`. El artefacto es derivado, no fuente: sale de los mismos datos que el HTML, en el mismo commit.
+- **CI — anti-drift del estado.json**: `check-consistency.js` verifica que cada `<p>-estado.json` parsea, declara `schema_version` bien formada, y que su `last_audit` coincide con el `LAST_AUDIT` de su tracker hermano. Un estado.json editado a mano que se desincronice del tracker rompe el build.
+- **Dogfood**: se emitió el `claude-audit-tracker-estado.json` de este propio repo, derivado de su tracker vigente.
+
 ## v1.11.1 — 2026-07-18
 - **Fix de carga (regresión de v1.11.0)**: el manifiesto declaraba `"hooks": "./hooks/hooks.json"`, pero Claude Code auto-carga ese archivo desde su ubicación estándar → «Duplicate hooks file detected» → el plugin **fallaba al cargar** en una instalación limpia. Nadie lo había visto porque nadie hizo el install end-to-end (era el pendiente `p-hooks-real`). Removida la referencia del manifiesto; los hooks se siguen auto-cargando. Verificado: instalación en config aislada da `Status: ✔ enabled`.
 - **README — sección Troubleshooting** basada en fricciones REALES de la primera instalación verificada (S04, encargo #7): duplicate hooks, sesiones web, namespace, caché/reinicio, repo privado.

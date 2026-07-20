@@ -1,0 +1,102 @@
+{
+  "schema_version": "1.0",
+  "proyecto": "claude-audit-tracker",
+  "last_audit": "2026-07-18 (re-auditoría tras v1.11.1 — install verificado + fix de carga)",
+  "closed_count": 10,
+  "calibracion": {
+    "unidad": "sesiones (~2-4h)",
+    "actores": "fede (hifede1) + Claude — misma cuenta GitHub: firma = comentario «✅ validado» en el PR",
+    "metodologia": "directa",
+    "loop": "orquestado (despacho activo)"
+  },
+  "bloques": [
+    {
+      "id": "b-audit",
+      "nombre": "/audit-tracker",
+      "zona": "Comandos — el producto",
+      "estado": "hecho",
+      "resumen": "Spec completa (3 fases, calibración de 5 ítems, tracker de 7 pestañas) y ejercitada de punta a punta en proyecto externo (nuecesmecohue 2026-07-14). Riesgo restante: mantenimiento, no diseño.",
+      "pendientes": []
+    },
+    {
+      "id": "b-prox",
+      "nombre": "/proximo-encargo",
+      "zona": "Comandos — el producto",
+      "estado": "curso",
+      "resumen": "Spec estable desde v1.1. Falta corrida real: ninguna máquina tomó jamás un encargo; se prueba en cuanto exista cola.",
+      "pendientes": []
+    },
+    {
+      "id": "b-orq",
+      "nombre": "/orquestar",
+      "zona": "Comandos — el producto",
+      "estado": "curso",
+      "resumen": "Spec completa y endurecida: 5 corridas verificadas, verificación en dos actores (v1.9), presupuesto por encargo (v1.10), snapshot local (v1.11). Falta: ramas difíciles (cambios pedidos, veto, silencio) y el post-mortem (S06).",
+      "pendientes": [
+        { "id": "p-learn", "txt": "Aprendizaje post-mortem: veto/escalada resuelta destila su lección a la referencia del tema (v2.0)", "sesion": "S06" }
+      ]
+    },
+    {
+      "id": "b-dist",
+      "nombre": "Marketplace + manifiestos + hooks",
+      "zona": "Distribución",
+      "estado": "curso",
+      "resumen": "Estructura validada, JSONs en verde, instalación end-to-end verificada en config aislada (2026-07-18, ✔ enabled tras el fix v1.11.1). Falta: ejercitar los hooks v1.11 en sesión real del CLI.",
+      "pendientes": [
+        { "id": "p-hooks-real", "txt": "Hooks v1.11 ejercitados en sesión real del CLI (SessionStart, statusline, nudge único)", "sesion": "S04" }
+      ]
+    },
+    {
+      "id": "b-ci",
+      "nombre": "Gates / CI del repo",
+      "zona": "Calidad",
+      "estado": "hecho",
+      "resumen": "validate.yml con 5 gates (parseo de JSONs, estructura de comandos, node --check de tracker y hooks, check-consistency). Test negativo verificado.",
+      "pendientes": []
+    },
+    {
+      "id": "b-docs",
+      "nombre": "README + CHANGELOG + referencias propias",
+      "zona": "Conocimiento",
+      "estado": "hecho",
+      "resumen": "README sincronizado, CHANGELOG v1.0→v1.11, docs/references/ poblado con 4 referencias con frontmatter, triggers y fecha. Riesgo: envejecimiento silencioso.",
+      "pendientes": []
+    }
+  ],
+  "plan": [
+    {
+      "sesion": "S04",
+      "titulo": "Instalación local verificada + hooks reales + troubleshooting",
+      "estimacion": 1,
+      "deps": [],
+      "cierra": ["p-hooks-real"]
+    },
+    {
+      "sesion": "S05",
+      "titulo": "Verificador independiente (v1.9)",
+      "estimacion": 1,
+      "deps": [],
+      "cierra": ["p-critic"]
+    },
+    {
+      "sesion": "S06",
+      "titulo": "Aprendizaje post-mortem (v2.0) — EN PAUSA: espera el primer veto real",
+      "estimacion": 1,
+      "deps": [],
+      "cierra": ["p-learn"]
+    }
+  ],
+  "decisiones_pendientes": [],
+  "referencias": [
+    { "tema": "openhands-agentes", "path": "docs/references/openhands-agentes.md", "frescura": "fresca", "fecha": "2026-07-13" },
+    { "tema": "claude-code-plugins", "path": "docs/references/claude-code-plugins.md", "frescura": "fresca", "fecha": "2026-07-16" },
+    { "tema": "ponytail", "path": "docs/references/ponytail.md", "frescura": "fresca", "fecha": "2026-07-16" },
+    { "tema": "doc-arquitecto", "path": "docs/references/doc-arquitecto.md", "frescura": "fresca", "fecha": "2026-07-18" }
+  ],
+  "referencias_faltantes": [],
+  "deuda": [
+    "Ramas difíciles del loop sin ejercitar (cambios pedidos, veto, silencio prolongado) — provocarlas a propósito en próximas corridas.",
+    "Sin telemetría del loop (rondas por encargo, escaladas, costo): decidir si vale la pena tras las primeras corridas.",
+    "Nuevo (v1.12.0): el estado.json se emite pero su emisión automática por /audit-tracker no se ejercitó en una corrida real todavía — se clava cuando batuta lo consuma end-to-end."
+  ]
+}

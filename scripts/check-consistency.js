@@ -4,6 +4,8 @@
 //   1. marketplace.json ↔ plugin.json: name y description idénticos
 //   2. plugin.json version == entrada más reciente del CHANGELOG
 //   3. hooks.json parsea y cada script que referencia existe en el plugin
+//   4. cada docs/audits/<p>-estado.json parsea, declara schema_version, y su
+//      last_audit coincide con el LAST_AUDIT de su tracker HTML hermano
 // Sale con código 1 y la lista de drift si algo no cierra.
 
 const fs = require('fs');
@@ -86,8 +88,37 @@ if (plugin.hooks) {
   }
 }
 
+// 4. estado.json ↔ tracker HTML (contrato de consumo, docs/estado-contrato.md)
+const auditsDir = path.join(root, 'docs/audits');
+if (fs.existsSync(auditsDir)) {
+  for (const file of fs.readdirSync(auditsDir)) {
+    if (!file.endsWith('-estado.json')) continue;
+    const rel = path.join('docs/audits', file);
+    let estado;
+    try {
+      estado = JSON.parse(read(rel));
+    } catch (e) {
+      errors.push(rel + ' no parsea como JSON: ' + e.message);
+      continue;
+    }
+    if (!/^\d+\.\d+$/.test(estado.schema_version || '')) {
+      errors.push(rel + ': schema_version ausente o mal formada (esperado "MAJOR.MINOR")');
+    }
+    // el tracker hermano: mismo prefijo, -tracker.html
+    const trackerRel = path.join('docs/audits', file.replace(/-estado\.json$/, '-tracker.html'));
+    if (fs.existsSync(path.join(root, trackerRel))) {
+      const m = read(trackerRel).match(/const LAST_AUDIT\s*=\s*"((?:[^"\\]|\\.)*)"/);
+      if (!m) {
+        errors.push(trackerRel + ': no encontré const LAST_AUDIT para cotejar con ' + file);
+      } else if (m[1] !== estado.last_audit) {
+        errors.push(rel + ': last_audit driftado vs su tracker — estado.json="' + estado.last_audit + '" vs tracker="' + m[1] + '"');
+      }
+    }
+  }
+}
+
 if (errors.length) {
   console.error('DRIFT detectado:\n- ' + errors.join('\n- '));
   process.exit(1);
 }
-console.log('consistencia OK (marketplace↔plugin, versión↔CHANGELOG, hooks↔archivos)');
+console.log('consistencia OK (marketplace↔plugin, versión↔CHANGELOG, hooks↔archivos, estado.json↔tracker)');
