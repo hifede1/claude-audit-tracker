@@ -18,6 +18,16 @@
         "ref": "main"
       },
       "description": "Produce y audita la documentación de un proyecto para que sea un contrato completo, coherente y verificable — el plano que el audit-tracker necesita para auditar la obra. /documentar: entrevista guiada (modo nuevo) o completado de huecos con diffs confirmados (modo existente). /auditar-docs: audita el plano mismo — completitud, contradicciones, criterios no verificables, decisiones sin registrar, referencias vencidas y drift doc↔doc."
+    },
+    {
+      "name": "batuta",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/hifede1/claude-batuta.git",
+        "path": "plugins/batuta",
+        "ref": "main"
+      },
+      "description": "Director de orquesta DELGADO: lleva un proyecto de objetivo a obra componiendo las herramientas del taller (doc-arquitecto + audit-tracker), sin reimplementar el trabajo de ninguna ni mover el loop sin firma. Cuatro fases (analizar · planificar · ejecutar-con-compuertas · cerrar), tres compuertas META (externos, EGRESO outward, workflow→cola), Compuerta Cero con firma autenticada por horizonte, y la cadena idea → plano → encargos → obra exhibida con todo desvío como hallazgo. Requiere plano VIGENTE firmado y estado.json de audit-tracker ≥1.12.0."
     }
   ]
 }
