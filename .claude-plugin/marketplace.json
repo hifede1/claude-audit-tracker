@@ -20,6 +20,16 @@
       "description": "Produce y audita la documentación de un proyecto para que sea un contrato completo, coherente y verificable — el plano que el audit-tracker necesita para auditar la obra. /documentar: entrevista guiada (modo nuevo) o completado de huecos con diffs confirmados (modo existente). /auditar-docs: audita el plano mismo — completitud, contradicciones, criterios no verificables, decisiones sin registrar, referencias vencidas y drift doc↔doc."
     },
     {
+      "name": "cartera",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/hifede1/claude-cartera.git",
+        "path": "plugins/cartera",
+        "ref": "main"
+      },
+      "description": "Worklist priorizado de toda la flota: recorre TODOS los proyectos del roster y devuelve UNA lista de trabajo priorizada entre ellos, leyendo solo evidencia dura que ya existe (GitHub, trackers commiteados) — estrictamente read-only. Regla de honestidad: lo no confirmable con evidencia fresca sale como VENCIDO, jamás verde cacheado. /cartera-roster: el disco descubre, el humano confirma, el roster manda."
+    },
+    {
       "name": "batuta",
       "source": {
         "source": "git-subdir",
