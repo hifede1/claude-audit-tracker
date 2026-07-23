@@ -38,6 +38,26 @@
         "ref": "main"
       },
       "description": "Director de orquesta DELGADO: lleva un proyecto de objetivo a obra componiendo las herramientas del taller (doc-arquitecto + audit-tracker), sin reimplementar el trabajo de ninguna ni mover el loop sin firma. Cuatro fases (analizar · planificar · ejecutar-con-compuertas · cerrar), tres compuertas META (externos, EGRESO outward, workflow→cola), Compuerta Cero con firma autenticada por horizonte, y la cadena idea → plano → encargos → obra exhibida con todo desvío como hallazgo. Requiere plano VIGENTE firmado y estado.json de audit-tracker ≥1.12.0."
+    },
+    {
+      "name": "publicador",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/hifede1/claude-publicador.git",
+        "path": "plugins/publicador",
+        "ref": "main"
+      },
+      "description": "Pre-flight y publicación firmada: verifica TODO antes de que algo salga al mundo (historia de git sin secretos en TODOS los commits, README/LICENSE, metadata, nombre disponible, cuenta/scope) y recién con checks verdes y firma humana ejecuta la publicación en GitHub, npm o el marketplace de plugins. Con UN check rojo no se publica nada; el silencio no es aprobación."
+    },
+    {
+      "name": "verificador",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/hifede1/claude-verificador.git",
+        "path": "plugins/verificador",
+        "ref": "main"
+      },
+      "description": "Convierte los criterios de aceptación de las fichas en tests trazables: clasifica con el humano (testeable / con esfuerzo / verificación manual), genera SIEMPRE esqueletos arrange-act-assert con nombre trazable test↔criterio (jamás un test completo inventado = jamás un verde falso), y registra lo no testeable como verificación manual explícita. Agnóstico de lenguaje con salvaguarda: lo que no domina degrada a esqueleto neutro, nunca a un test roto."
     }
   ]
 }
