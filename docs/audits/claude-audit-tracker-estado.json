@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "proyecto": "claude-audit-tracker",
-  "last_audit": "2026-07-18 (re-auditoría tras v1.11.1 — install verificado + fix de carga)",
+  "last_audit": "2026-07-23 (re-auditoría tras v1.12.0 + altas de batuta y cartera al marketplace)",
   "closed_count": 10,
   "calibracion": {
     "unidad": "sesiones (~2-4h)",
@@ -33,7 +33,11 @@
       "estado": "curso",
       "resumen": "Spec completa y endurecida: 5 corridas verificadas, verificación en dos actores (v1.9), presupuesto por encargo (v1.10), snapshot local (v1.11). Falta: ramas difíciles (cambios pedidos, veto, silencio) y el post-mortem (S06).",
       "pendientes": [
-        { "id": "p-learn", "txt": "Aprendizaje post-mortem: veto/escalada resuelta destila su lección a la referencia del tema (v2.0)", "sesion": "S06" }
+        {
+          "id": "p-learn",
+          "txt": "Aprendizaje post-mortem: veto/escalada resuelta destila su lección a la referencia del tema (v2.0)",
+          "sesion": "S06"
+        }
       ]
     },
     {
@@ -43,7 +47,11 @@
       "estado": "curso",
       "resumen": "Estructura validada, JSONs en verde, instalación end-to-end verificada en config aislada (2026-07-18, ✔ enabled tras el fix v1.11.1). Falta: ejercitar los hooks v1.11 en sesión real del CLI.",
       "pendientes": [
-        { "id": "p-hooks-real", "txt": "Hooks v1.11 ejercitados en sesión real del CLI (SessionStart, statusline, nudge único)", "sesion": "S04" }
+        {
+          "id": "p-hooks-real",
+          "txt": "Hooks v1.11 ejercitados en sesión real del CLI (SessionStart, statusline, nudge único)",
+          "sesion": "S04"
+        }
       ]
     },
     {
@@ -69,29 +77,46 @@
       "titulo": "Instalación local verificada + hooks reales + troubleshooting",
       "estimacion": 1,
       "deps": [],
-      "cierra": ["p-hooks-real"]
-    },
-    {
-      "sesion": "S05",
-      "titulo": "Verificador independiente (v1.9)",
-      "estimacion": 1,
-      "deps": [],
-      "cierra": ["p-critic"]
+      "cierra": [
+        "p-hooks-real"
+      ]
     },
     {
       "sesion": "S06",
       "titulo": "Aprendizaje post-mortem (v2.0) — EN PAUSA: espera el primer veto real",
       "estimacion": 1,
       "deps": [],
-      "cierra": ["p-learn"]
+      "cierra": [
+        "p-learn"
+      ]
     }
   ],
   "decisiones_pendientes": [],
   "referencias": [
-    { "tema": "openhands-agentes", "path": "docs/references/openhands-agentes.md", "frescura": "fresca", "fecha": "2026-07-13" },
-    { "tema": "claude-code-plugins", "path": "docs/references/claude-code-plugins.md", "frescura": "fresca", "fecha": "2026-07-16" },
-    { "tema": "ponytail", "path": "docs/references/ponytail.md", "frescura": "fresca", "fecha": "2026-07-16" },
-    { "tema": "doc-arquitecto", "path": "docs/references/doc-arquitecto.md", "frescura": "fresca", "fecha": "2026-07-18" }
+    {
+      "tema": "openhands-agentes",
+      "path": "docs/references/openhands-agentes.md",
+      "frescura": "fresca",
+      "fecha": "2026-07-13"
+    },
+    {
+      "tema": "claude-code-plugins",
+      "path": "docs/references/claude-code-plugins.md",
+      "frescura": "fresca",
+      "fecha": "2026-07-16"
+    },
+    {
+      "tema": "ponytail",
+      "path": "docs/references/ponytail.md",
+      "frescura": "fresca",
+      "fecha": "2026-07-16"
+    },
+    {
+      "tema": "doc-arquitecto",
+      "path": "docs/references/doc-arquitecto.md",
+      "frescura": "fresca",
+      "fecha": "2026-07-18"
+    }
   ],
   "referencias_faltantes": [],
   "deuda": [
