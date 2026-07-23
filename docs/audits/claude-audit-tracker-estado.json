@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "proyecto": "claude-audit-tracker",
-  "last_audit": "2026-07-23 (re-auditoría tras v1.12.0 + altas de batuta y cartera al marketplace)",
+  "last_audit": "2026-07-24 (bookkeeping: marketplace a 6 — altas de publicador y verificador, PR #36)",
   "closed_count": 10,
   "calibracion": {
     "unidad": "sesiones (~2-4h)",
