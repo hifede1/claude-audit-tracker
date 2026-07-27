@@ -119,10 +119,30 @@ el silencio **no** aprueba.
 
 📚 **Referencias.** `docs/references/openhands-agentes.md`
 
-⛓️ **Prerrequisitos.** Ninguno. **Esta sesión DESTRABA el tercer criterio de S06**: el veto que
-produce es el caso real que la lección post-mortem necesita.
+⛓️ **Prerrequisitos.** Ninguno para empezar. **Esta sesión DESTRABA el tercer criterio de S06**:
+el veto que produce es el caso real que la lección post-mortem necesita.
 
-**Estimación: M**
+> ### ⚠️ Corrección de clasificación (2026-07-27)
+>
+> Esta sesión nació declarada **gated-por-EJECUCIÓN**. **Es incorrecto**, y lo detectó la fase
+> `planificar` de `batuta` al enumerar sus criterios:
+>
+> | Criterio | Qué lo cierra realmente |
+> |---|---|
+> | C1 · cambios pedidos | **un acto del validador** — pedir cambios dos veces |
+> | C2 · veto | **un acto del validador** — cerrar un PR sin mergear |
+> | C3 · silencio | **72 horas de reloj** |
+>
+> **Ninguno lo cierra la máquina trabajando.** Lo que la máquina cierra sola es *preparar el
+> escenario*: publicar los encargos-vehículo (hecho el 2026-07-27, issues **#40**, **#41**,
+> **#42**). De ahí en adelante la sesión avanza por **actos del validador** y por el **paso del
+> tiempo**.
+>
+> Se corrige porque la clasificación equivocada tiene un costo concreto y conocido: si se lee
+> como ejecución, la sesión se encarga y queda esperando sin que nadie sepa por qué — **la misma
+> enfermedad que tuvo S06 durante dos semanas**, un escalón más arriba.
+
+**Estimación: M** (la preparación) **+ dos actos del validador + 72h de reloj**
 
 ---
 
@@ -183,10 +203,19 @@ como evidencia; ninguna cantidad de código la destraba.
 | S04 | Instalación verificada + hooks reales | S | ✅ cerrada (v1.11.1) |
 | **S06** | Aprendizaje post-mortem | S | ⏸️ **EVENTO** — la destraba S08 |
 | **S07** | Ejercitar `/proximo-encargo` | S | — |
-| **S08** | Provocar las ramas difíciles del loop | M | — |
+| **S08** | Provocar las ramas difíciles del loop | M | **ACTO DEL VALIDADOR** + 72h de reloj *(la preparación ya está: #40 · #41 · #42)* |
 | **S09** | Consumo end-to-end del `estado.json` | S | plano firmado ✅ (esta corrida) |
 | **S10** | Decidir telemetría | S | **FIRMA** + evidencia de S07/S08 |
 
-**Tres compuertas distintas, declaradas:** S07 y S08 esperan **ejecución**; S06 espera un
-**evento** (que S08 produce); S10 espera una **firma**. Confundirlas es lo que deja un proyecto
-esperando meses por «que alguien lo haga» cuando en realidad esperaba otra cosa.
+**Cuatro compuertas distintas, declaradas** *(corregido el 2026-07-27)*: **S07** espera
+**ejecución** · **S06** espera un **evento** (que S08 produce) · **S10** espera una **firma** ·
+**S08** espera **dos actos del validador y 72h de reloj** — su preparación ya está hecha.
+
+Confundirlas es lo que deja un proyecto esperando meses por «que alguien lo haga» cuando en
+realidad esperaba otra cosa.
+
+> **Y este plan ya se equivocó una vez, en su primera semana de vida.** S08 nació clasificada
+> como ejecución y no lo era: nadie la habría destrabado trabajando. Lo detectó la fase
+> `planificar` de `batuta` al enumerar criterio por criterio — no la intuición de nadie. La
+> lección no es que el plan estaba mal; es que **la clasificación hay que derivarla de los
+> criterios, no asignarla al escribir la ficha.**
