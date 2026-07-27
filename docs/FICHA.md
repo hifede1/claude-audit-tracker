@@ -1,7 +1,7 @@
 # Ficha de diseño: `audit-tracker`
 
 > **Estado: VIGENTE**
-> Firmado: 2026-07-26 por Fede
+> Firmado: 2026-07-27 por Fede
 
 **Procedencia de la firma (`018`).** Dos actos rastreables. **(1) Decisión:** en sesión
 interactiva del 2026-07-26, Fede eligió explícitamente —entre opciones con tradeoffs— que este
