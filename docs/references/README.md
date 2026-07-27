@@ -12,7 +12,7 @@ Actualizado: 2026-07-26.
 | Tema | Qué resuelve | Fecha | Triggers | Quién la usa | Frescura |
 |---|---|---|---|---|---|
 | **Anatomía, instalación y gotchas de plugins/marketplaces de Claude Code** | Cómo se estructura, distribuye e instala el plugin, y qué rompe en el camino | 2026-07-13 | `plugin`, `marketplace`, `instalación`, `comandos`, `namespace`, `reload`, `distribución` | S07 · histórico: v1.11.x (distribución) | 🟠 |
-| **`doc-arquitecto` — la herramienta hermana que produce y audita el plano** | Qué consume `audit-tracker` como entrada y de dónde sale | 2026-07-18 | `doc-arquitecto`, `documentación`, `plano`, `documentar`, `auditar-docs`, `contrato`, `references`, `fede-tools` | `FICHA.md` §5 · histórico: v1.12.0 | 🟠 |
+| **`doc-arquitecto` — la herramienta hermana que produce y audita el plano** | Qué consume `audit-tracker` como entrada y de dónde sale | 2026-07-27 | `doc-arquitecto`, `documentación`, `plano`, `documentar`, `auditar-docs`, `contrato`, `references`, `fede-tools` | `FICHA.md` §5 · histórico: v1.12.0 | 🟢 |
 | **Patrones de agentes autónomos de OpenHands aplicables al modo orquestado** | De dónde salen el critic model, el freno anti-loop y la firma por riesgo | 2026-07-13 | `orquestador`, `critic`, `verificador`, `confirmation mode`, `microagents`, `stuck detection`, `firma por riesgo`, `presupuesto`, `loop autónomo` | S08 · histórico: v1.8.0, v1.9.0, v1.10.0 | 🟢 |
 | **Ponytail — arquitectura de un plugin multi-agente con hooks** | Qué patrones de hooks se adoptaron, y cuáles se descartaron con su porqué | 2026-07-16 | `hooks`, `statusline`, `lifecycle`, `snapshot`, `estado`, `never-block`, `ponytail`, `yagni`, `skills`, `subagentes`, `consistencia`, `CI` | histórico: v1.11.0 (hooks + CI) | 🟢 |
 | **El taller `fede-tools`** *(business)* | Para quién es el proyecto, su lugar en la flota y bajo qué restricciones se construye | 2026-07-26 | `taller`, `fede-tools`, `marketplace`, `flota`, `batuta`, `doc-arquitecto`, `publicador`, `verificador`, `cartera`, `licencia`, `colaboradores` | `FICHA.md` §5 · `VISION.md` §6 | 🟢 |
@@ -27,9 +27,9 @@ Actualizado: 2026-07-26.
 | Ponytail | `docs/references/ponytail.md` |
 | El taller `fede-tools` | `docs/business/taller-fede-tools.md` |
 
-## Por qué dos referencias están en 🟠
+## Por qué una referencia está en 🟠
 
-La frescura evalúa vigencia, y estas dos tienen **drift verificado**, no sospechado:
+La frescura evalúa vigencia, y este drift está **verificado**, no sospechado:
 
 1. **Plugins de Claude Code** (2026-07-13) — **no contiene el gotcha que rompió la v1.11.0**:
    declarar `"hooks": "./hooks/hooks.json"` en el manifiesto provoca doble carga («Duplicate
@@ -38,11 +38,16 @@ La frescura evalúa vigencia, y estas dos tienen **drift verificado**, no sospec
    el README (§Troubleshooting) y en el CHANGELOG. **Refresco: incorporar el gotcha con su fecha
    y el link al fix de v1.11.1.**
 
-2. **`doc-arquitecto`** (2026-07-18) — su bloque `fuentes` cita
-   `claude-doc-arquitecto/docs/FICHA.md — contrato de diseño **firmado**`, y el 2026-07-26 se
-   verificó que **esa ficha NO lleva la línea de firma de `011`**: dice «(firmada por Fede el
-   2026-07-17)», que es una *mención* de firma, no la firma. Para el contrato del taller, esa
-   ficha es **borrador**. **Refresco: corregir la caracterización de la fuente.**
+### ✅ Resuelto el 2026-07-27 — `doc-arquitecto`
+
+Su bloque `fuentes` citaba `claude-doc-arquitecto/docs/FICHA.md` como «contrato de diseño
+**firmado**», y se verificó que **esa ficha no lleva la línea de ratificación de `011`**: tiene
+una *mención* de firma en prosa. Para el contrato del taller es **borrador**.
+
+**Corregido** en el encargo [#41](https://github.com/hifede1/claude-audit-tracker/issues/41): la
+fuente ahora describe lo que esa ficha es, con su fecha de verificación, y la referencia explica
+por qué la distinción importa — sin transcribir la línea de `011`, que produciría falso positivo
+en cualquier chequeo mecánico de precondición.
 
 ## Faltantes
 

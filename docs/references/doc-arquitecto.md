@@ -1,10 +1,12 @@
 ---
 tema: doc-arquitecto — la herramienta hermana que produce y audita el plano (el contrato que este audit-tracker consume)
 triggers: [doc-arquitecto, documentación, plano, documentar, auditar-docs, contrato, references, fede-tools]
-fecha: 2026-07-18
+fecha: 2026-07-27
 fuentes:
   - https://github.com/hifede1/claude-doc-arquitecto (v1.0.0)
-  - claude-doc-arquitecto/docs/FICHA.md — contrato de diseño firmado
+  - claude-doc-arquitecto/docs/FICHA.md — ficha de diseño. ⚠️ NO está firmada bajo el contrato del
+    taller: al 2026-07-27 no lleva la línea de ratificación que fija `011`. Lo que tiene es una
+    mención de firma en prosa («completado y publicado (firmada por Fede el 2026-07-17)»).
   - claude-doc-arquitecto/README.md
   - Verificación empírica: pipeline e2e doc-arquitecto → audit-tracker (2026-07-17)
 ---
@@ -22,6 +24,27 @@ upstream del par; se instala junto con el audit-tracker desde el mismo marketpla
 /documentar  →  /auditar-docs  →  código (encargos)  →  /audit-tracker
 (escribir el plano) (auditar el plano)  (construir)        (auditar la obra)
 ```
+
+> ### ⚠️ Corrección de esta referencia (2026-07-27)
+>
+> Hasta hoy, el bloque `fuentes` de arriba citaba la ficha de `claude-doc-arquitecto` como
+> **«contrato de diseño firmado»**. **Es falso**, y se verificó el 2026-07-26/27: esa ficha
+> **no lleva la línea de ratificación** que fija `011`. Lo que tiene es una mención de firma en
+> prosa: *«completado y publicado (firmada por Fede el 2026-07-17)»*.
+>
+> **Y esa diferencia no es formalismo.** Una mención de firma **no es** la firma: leerla como
+> ratificación es construir sobre contrato no ratificado, que es la línea roja de `003`/`011`.
+> Es exactamente el hallazgo que motivó el fix #37/#38 de `batuta`, y por eso `batuta` trata hoy
+> a `claude-doc-arquitecto` como **plano en borrador** y frena si se le pide construir sobre él.
+>
+> **Cómo se propagó:** el dato incorrecto no se quedó quieto. Nació en la ficha de otro repo,
+> viajó a esta referencia, y desde acá habría alimentado a cualquier encargo que la cargara por
+> `trigger`. Un dato mal en un documento base no envejece: se reproduce.
+>
+> *(Nota deliberada: esta referencia **no transcribe** la línea de ratificación de `011`. Un
+> documento que la contiene produce falso positivo en cualquier chequeo mecánico de precondición
+> — error real detectado el 2026-07-26 en `claude-flota`, donde un plano en borrador se leyó
+> como firmado por tenerla escrita como ejemplo.)*
 
 ## Los dos comandos
 
