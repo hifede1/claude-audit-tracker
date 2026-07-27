@@ -16,6 +16,7 @@ Actualizado: 2026-07-27.
 | **Patrones de agentes autónomos de OpenHands aplicables al modo orquestado** | De dónde salen el critic model, el freno anti-loop y la firma por riesgo | 2026-07-13 | `orquestador`, `critic`, `verificador`, `confirmation mode`, `microagents`, `stuck detection`, `firma por riesgo`, `presupuesto`, `loop autónomo` | S08 · histórico: v1.8.0, v1.9.0, v1.10.0 | 🟢 |
 | **Ponytail — arquitectura de un plugin multi-agente con hooks** | Qué patrones de hooks se adoptaron, y cuáles se descartaron con su porqué | 2026-07-16 | `hooks`, `statusline`, `lifecycle`, `snapshot`, `estado`, `never-block`, `ponytail`, `yagni`, `skills`, `subagentes`, `consistencia`, `CI` | histórico: v1.11.0 (hooks + CI) | 🟢 |
 | **El taller `fede-tools`** *(business)* | Para quién es el proyecto, su lugar en la flota y bajo qué restricciones se construye | 2026-07-26 | `taller`, `fede-tools`, `marketplace`, `flota`, `batuta`, `doc-arquitecto`, `publicador`, `verificador`, `cartera`, `licencia`, `colaboradores` | `FICHA.md` §5 · `VISION.md` §6 | 🟢 |
+| **Verificación de criterios: cómo el chequeo mecánico engaña** | Las cuatro formas verificadas en que un `grep` sobre prosa da falso, y qué hacer en su lugar | 2026-07-27 | `verificación`, `criterio`, `grep`, `chequeo`, `evidencia`, `informe de verificación`, `falso positivo`, `falso negativo`, `precondición`, `firma`, `duplicación` | S06 (post-mortem) · todo encargo con criterios documentales | 🟢 |
 
 ## Ubicación
 
@@ -26,6 +27,7 @@ Actualizado: 2026-07-27.
 | OpenHands / agentes | `docs/references/openhands-agentes.md` |
 | Ponytail | `docs/references/ponytail.md` |
 | El taller `fede-tools` | `docs/business/taller-fede-tools.md` |
+| Verificación de criterios | `docs/references/verificacion-de-criterios.md` |
 
 ## Movimientos de frescura
 
