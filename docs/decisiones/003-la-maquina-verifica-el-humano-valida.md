@@ -4,6 +4,9 @@
 retrospectivamente el 2026-07-26
 **Procedencia:** decisión estructural del modo orquestado; sobrevivió a un panel adversarial
 (8 agujeros cerrados, v1.4.x). Ratificada por los merges del dueño.
+**Registros previos que absorbe:** **`d2`** («La firma humana es la única puerta al merge») y
+**`d7`** («Umbral de firma por riesgo: por ahora NADA automergea»), ambas del tracker desde
+2026-07-13. Desde el 2026-07-27 la fuente es este archivo.
 **superaA:** —
 
 ## Contexto / problema

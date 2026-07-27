@@ -3,6 +3,8 @@
 **Estado:** ✅ **aceptada** · 2026-07-20 (v1.12.0) · asentada retrospectivamente el 2026-07-26
 **Procedencia:** pedida por `batuta` en el issue #31; contrato completo en
 `docs/estado-contrato.md`. Ratificada por el merge del dueño.
+**Registro previo:** ninguno — el tracker **no** la tenía registrada pese a ser el contrato que
+otras herramientas consumen. Este ADR la asienta por primera vez.
 **superaA:** —
 
 ## Contexto / problema

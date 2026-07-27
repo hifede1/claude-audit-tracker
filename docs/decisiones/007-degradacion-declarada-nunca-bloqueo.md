@@ -4,6 +4,10 @@
 retrospectivamente el 2026-07-26
 **Procedencia:** tres decisiones convergentes, cada una nacida de un hallazgo real (la de v1.8.1,
 en vivo durante la primera corrida real — S03, issue #6). Ratificadas por los merges del dueño.
+**Registros previos que absorbe:** **`d5`** («La Fase 0 jamás bloquea: fallback declarado de
+calibración», 2026-07-13) y **`d8`** («Estado entre sesiones: hooks de solo-lectura + snapshot
+como cache; skills auto-activables descartadas», 2026-07-16), ambas del tracker. Desde el
+2026-07-27 la fuente es este archivo.
 **superaA:** —
 
 ## Contexto / problema

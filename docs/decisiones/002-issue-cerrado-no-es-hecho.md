@@ -3,6 +3,8 @@
 **Estado:** ✅ **aceptada** · 2026-07-09 (v1.0.0) · asentada retrospectivamente el 2026-07-26
 **Procedencia:** decisión fundacional de v1.0.0, vigente desde entonces y verificable en el
 comportamiento del comando. Ratificada por los merges del dueño.
+**Registro previo:** ninguno — el tracker **no** la tenía registrada pese a ser fundacional.
+Este ADR la asienta por primera vez.
 **superaA:** —
 
 ## Contexto / problema

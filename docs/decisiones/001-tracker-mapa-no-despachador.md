@@ -4,6 +4,9 @@
 **Procedencia:** decisión tomada e implementada en v1.0.0/v1.1.0; ratificada por el merge del
 dueño (`hifede1`) de los PRs que la construyeron. Este ADR le da forma de contrato a una
 decisión ya vigente — **no la re-litiga**.
+**Registro previo que absorbe:** **`d1`** del tracker («El estado del loop vive en GitHub; el
+tracker es mapa sin backend», registrada 2026-07). Desde el 2026-07-27 la fuente es este archivo
+y el tracker lo linkea.
 **superaA:** —
 
 ## Contexto / problema

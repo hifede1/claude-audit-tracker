@@ -78,6 +78,18 @@ orquesta el ciclo entero sin reimplementar ninguno de los dos.
 | `005` | Blindaje anti-inyección | ✅ aceptada · 2026-07-13 |
 | `006` | Estado consumible por máquinas | ✅ aceptada · 2026-07-20 |
 | `007` | Degradación declarada, nunca bloqueo silencioso | ✅ aceptada · 2026-07-13→16 |
+| `008` | Excepción de bookkeeping: el PR del tracker se automergea | ✅ aceptada · 2026-07-13 |
+| `009` | Referencias con `triggers`: el conocimiento busca al encargo | ✅ aceptada · 2026-07-13 |
+
+> **`docs/decisiones/` es LA fuente de decisiones de este proyecto** (decidido el 2026-07-27).
+> El tracker las **linkea y cura**, no las duplica. Cada ADR declara qué registro previo del
+> tracker absorbe (`d1`–`d8`), para que el mapeo no se pierda.
+>
+> **Cómo pasó:** el 2026-07-26 se creó `docs/decisiones/001`–`007` sin advertir que el tracker
+> ya mantenía `d1`–`d8` desde julio. Quedaron **dos registros del mismo dato** — el drift exacto
+> que este producto existe para detectar, dentro del producto mismo. La re-auditoría del
+> 2026-07-27 lo encontró y lo resolvió: se escribieron los ADRs faltantes (`008` ← `d3`,
+> `009` ← `d4`) y se declaró la fuente única.
 
 **Pendientes:** **ninguna que bloquee hoy.** Hay **una futura, gated-por-firma**: la telemetría
 del loop, con sesión propia (`PLAN.md` S10) — no bloquea porque ninguna capacidad vigente
