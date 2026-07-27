@@ -1,13 +1,14 @@
 ---
 tema: Anatomía, instalación y gotchas de plugins/marketplaces de Claude Code
-triggers: [plugin, marketplace, instalación, comandos, namespace, reload, distribución]
-fecha: 2026-07-13
+triggers: [plugin, marketplace, instalación, comandos, namespace, reload, distribución, hooks, manifiesto, plugin.json, carga]
+fecha: 2026-07-27
 fuentes:
   - https://code.claude.com/docs/en/plugins.md
   - https://code.claude.com/docs/en/plugin-marketplaces.md
   - https://code.claude.com/docs/en/discover-plugins.md
   - https://code.claude.com/docs/en/claude-code-on-the-web.md
   - Verificación empírica en este repo (2026-07-13)
+  - Instalación end-to-end en config aislada (2026-07-18) — origen del gotcha 7
 ---
 
 # Plugins de Claude Code — cómo se empaqueta y distribuye este plugin
@@ -63,9 +64,28 @@ Verificación: `/plugin list` (o menú `/plugin` → Installed / Errors).
    marketplace.
 6. **Scope**: instalar en scope `local` no viaja a otras sesiones/máquinas; usar
    `--scope user` para tenerlo en toda la máquina.
+7. **⚠️ NO declares `hooks` en el manifiesto del plugin** — *el más caro de esta lista.*
+   Claude Code **auto-carga** `hooks/hooks.json` desde su ubicación estándar. Si además lo
+   declarás en `plugin.json` (`"hooks": "./hooks/hooks.json"`), se carga **dos veces**:
+   `Duplicate hooks file detected` → **`Status: ✘ failed to load`**. El plugin entero deja de
+   cargar, no solo los hooks.
+   **Verificado el 2026-07-18** en instalación limpia con config aislada (`CLAUDE_CONFIG_DIR`).
+   Fix: quitar la referencia del manifiesto — los hooks se auto-cargan igual
+   ([PR #27](https://github.com/hifede1/claude-audit-tracker/pull/27), v1.11.1).
+   **Por qué nadie lo vio antes:** ver §Estado de verificación — este fallo solo aparece al
+   instalar, y nada en el pipeline instalaba.
 
 ## Estado de verificación
 
-La instalación local end-to-end sigue SIN verificarse en máquina real → encargo S04
-(issue #7). Cuando se haga, las fricciones reales de esa corrida se añaden acá y al
-Troubleshooting del README.
+**Instalación end-to-end: VERIFICADA el 2026-07-18** (encargo S04, issue #7), en config aislada
+con `CLAUDE_CONFIG_DIR` → `Status: ✔ enabled`.
+
+Esa corrida produjo el fix de la v1.11.1, y sus fricciones se incorporaron acá y al
+§Troubleshooting del README.
+
+> **La lección, que vale más que el gotcha:** la v1.11.0 se publicó con el plugin roto y nadie
+> lo notó, porque **el pipeline validaba los JSON y la estructura pero nada instalaba el
+> plugin** — y el fallo solo aparece al instalar. El pendiente que lo habría atrapado
+> (`p-install`) existía y llevaba semanas abierto.
+>
+> *Un artefacto que no se instala nunca no está verificado: está declarado.*
