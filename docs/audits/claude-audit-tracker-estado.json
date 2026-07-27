@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
   "proyecto": "claude-audit-tracker",
-  "last_audit": "2026-07-27 (2) (bookkeeping S08: 3 encargos mergeados + PRIMER VETO REAL del loop — S06 destrabada; 2 de 3 ramas sin cerrar)",
-  "closed_count": 10,
+  "last_audit": "2026-07-27 (3) (S06 CERRADA — v1.13.0: el post-mortem destila lecciones y la re-auditoría lo verifica; primera lección en docs/references/)",
+  "closed_count": 11,
   "calibracion": {
     "unidad": "sesiones (~2-4h)",
     "actores": "fede (hifede1) + Claude — misma cuenta GitHub: firma = comentario «✅ validado» en el PR",
@@ -31,14 +31,8 @@
       "nombre": "/orquestar",
       "zona": "Comandos — el producto",
       "estado": "curso",
-      "resumen": "Spec completa y endurecida: 5 corridas verificadas, verificación en dos actores (v1.9), presupuesto por encargo (v1.10), snapshot local (v1.11). Falta: ramas difíciles (cambios pedidos, veto, silencio) y el post-mortem (S06).",
-      "pendientes": [
-        {
-          "id": "p-learn",
-          "txt": "Aprendizaje post-mortem: veto/escalada resuelta destila su lección a la referencia del tema (v2.0)",
-          "sesion": "S06"
-        }
-      ]
+      "resumen": "Spec completa y endurecida: 5 corridas verificadas, verificación en dos actores (v1.9), presupuesto por encargo (v1.10), snapshot local (v1.11). Falta: ramas difíciles (cambios pedidos, veto, silencio) y el post-mortem (S06). v1.13.0 (S06): el loop DESTILA la lección de cada veto o escalada resuelta a docs/references/ con fecha y link al PR de origen, y la re-auditoría lo verifica — episodio sin lección = pendiente nuevo. Si el episodio no dejó conocimiento, se declara: la ausencia declarada cumple la regla, el silencio no.",
+      "pendientes": []
     },
     {
       "id": "b-dist",
@@ -79,15 +73,6 @@
       "deps": [],
       "cierra": [
         "p-hooks-real"
-      ]
-    },
-    {
-      "sesion": "S06",
-      "titulo": "Aprendizaje post-mortem (v2.0) — DESTRABADA el 2026-07-27: el veto del PR #44 es el caso real que su criterio 3 esperaba desde el 2026-07-13",
-      "estimacion": 1,
-      "deps": [],
-      "cierra": [
-        "p-learn"
       ]
     },
     {
@@ -148,6 +133,12 @@
       "frescura": "refresco",
       "fecha": "2026-07-18",
       "motivo_refresco": "cita la FICHA de claude-doc-arquitecto como «contrato de diseño firmado» y esa ficha NO lleva la línea de ratificación de 011. Su corrección se fue con el PR #44, VETADO: el encargo #41 quedó liberado y no se re-toma sin re-priorización."
+    },
+    {
+      "tema": "Verificación de criterios: cómo el chequeo mecánico engaña",
+      "path": "docs/references/verificacion-de-criterios.md",
+      "frescura": "fresca",
+      "fecha": "2026-07-27"
     }
   ],
   "referencias_faltantes": [
