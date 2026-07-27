@@ -2,6 +2,8 @@
 
 **Estado:** ✅ **aceptada** · 2026-07-13 (v1.10.0) · asentada retrospectivamente el 2026-07-26
 **Procedencia:** decisión de v1.10.0, vigente. Ratificada por el merge del dueño.
+**Registro previo:** ninguno — el tracker **no** la tenía registrada. Este ADR la asienta por
+primera vez.
 **superaA:** —
 
 ## Contexto / problema

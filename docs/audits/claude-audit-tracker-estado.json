@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "proyecto": "claude-audit-tracker",
-  "last_audit": "2026-07-24 (bookkeeping: marketplace a 6 — altas de publicador y verificador, PR #36)",
+  "last_audit": "2026-07-27 (plano firmado PR #38: FICHA/VISION/ALCANCE/PLAN + 9 ADRs; S07-S10 abiertas; fuente única de decisiones)",
   "closed_count": 10,
   "calibracion": {
     "unidad": "sesiones (~2-4h)",
@@ -67,7 +67,7 @@
       "nombre": "README + CHANGELOG + referencias propias",
       "zona": "Conocimiento",
       "estado": "hecho",
-      "resumen": "README sincronizado, CHANGELOG v1.0→v1.11, docs/references/ poblado con 4 referencias con frontmatter, triggers y fecha. Riesgo: envejecimiento silencioso.",
+      "resumen": "README sincronizado. CHANGELOG.md v1.0→v1.12.0. docs/references/ con 4 referencias (frontmatter triggers/fuentes/fecha) más su catálogo README.md. 2026-07-26/27 (PR #38): el repo ganó su propio plano — era el único de los 7 propios sin él. FICHA.md con la línea de firma de 011, VISION, ALCANCE, PLAN y docs/decisiones/ con 9 ADRs, declarada FUENTE ÚNICA de decisiones (el registro del tracker linkea y cura, no duplica).",
       "pendientes": []
     }
   ],
@@ -89,6 +89,37 @@
       "cierra": [
         "p-learn"
       ]
+    },
+    {
+      "sesion": "S07",
+      "titulo": "Ejercitar /proximo-encargo en corrida real",
+      "estimacion": 1,
+      "deps": [],
+      "cierra": []
+    },
+    {
+      "sesion": "S08",
+      "titulo": "Provocar las ramas difíciles del loop (cambios pedidos · veto · silencio 72h) — DESTRABA S06",
+      "estimacion": 2,
+      "deps": [],
+      "cierra": []
+    },
+    {
+      "sesion": "S09",
+      "titulo": "Consumo end-to-end del estado.json por un tercero (batuta)",
+      "estimacion": 1,
+      "deps": [],
+      "cierra": []
+    },
+    {
+      "sesion": "S10",
+      "titulo": "Decidir la telemetría del loop",
+      "estimacion": 1,
+      "deps": [
+        "S07",
+        "S08"
+      ],
+      "cierra": []
     }
   ],
   "decisiones_pendientes": [],
@@ -102,8 +133,9 @@
     {
       "tema": "claude-code-plugins",
       "path": "docs/references/claude-code-plugins.md",
-      "frescura": "fresca",
-      "fecha": "2026-07-16"
+      "frescura": "refresco",
+      "fecha": "2026-07-16",
+      "motivo_refresco": "no contiene el gotcha de duplicate-hooks que rompió la v1.11.0, descubierto 5 días después de escribirla"
     },
     {
       "tema": "ponytail",
@@ -114,14 +146,31 @@
     {
       "tema": "doc-arquitecto",
       "path": "docs/references/doc-arquitecto.md",
-      "frescura": "fresca",
-      "fecha": "2026-07-18"
+      "frescura": "refresco",
+      "fecha": "2026-07-18",
+      "motivo_refresco": "cita la FICHA de claude-doc-arquitecto como «contrato de diseño firmado», y esa ficha NO lleva la línea de firma de 011"
     }
   ],
-  "referencias_faltantes": [],
+  "referencias_faltantes": [
+    {
+      "tema": "Telemetría y observabilidad de loops autónomos",
+      "la_necesita": "S10",
+      "triggers": [
+        "telemetría",
+        "observabilidad",
+        "métricas",
+        "costo",
+        "rondas",
+        "escaladas",
+        "presupuesto",
+        "loop"
+      ]
+    }
+  ],
   "deuda": [
-    "Ramas difíciles del loop sin ejercitar (cambios pedidos, veto, silencio prolongado) — provocarlas a propósito en próximas corridas.",
-    "Sin telemetría del loop (rondas por encargo, escaladas, costo): decidir si vale la pena tras las primeras corridas.",
-    "Nuevo (v1.12.0): el estado.json se emite pero su emisión automática por /audit-tracker no se ejercitó en una corrida real todavía — se clava cuando batuta lo consuma end-to-end."
+    "Ramas difíciles del loop sin ejercitar (cambios pedidos, veto, silencio prolongado) — provocarlas a propósito. La toma S08, y su veto DESTRABA el criterio 3 de S06.",
+    "Sin telemetría del loop (rondas por encargo, escaladas, costo): decidir si vale la pena. La toma S10 — gated-por-FIRMA, no por ejecución.",
+    "/proximo-encargo especificado desde v1.1 y JAMÁS ejercitado: ninguna máquina tomó nunca un encargo. La toma S07.",
+    "La emisión automática del estado.json no se ejercitó end-to-end: batuta lo consumió el 2026-07-26 pero su corrida frenó antes, por precondición de plano (levantada por el PR #38). La toma S09."
   ]
 }

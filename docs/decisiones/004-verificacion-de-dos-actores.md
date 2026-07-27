@@ -3,6 +3,8 @@
 **Estado:** ✅ **aceptada** · 2026-07-13 (v1.9.0) · asentada retrospectivamente el 2026-07-26
 **Procedencia:** inspirada en el *critic model* de OpenHands (`docs/references/openhands-agentes.md`).
 Ratificada por el merge del dueño.
+**Registro previo que absorbe:** **`d6`** del tracker («El verificador independiente revisa TODO
+encargo salvo bookkeeping», 2026-07-13). Desde el 2026-07-27 la fuente es este archivo.
 **superaA:** —
 
 ## Contexto / problema
