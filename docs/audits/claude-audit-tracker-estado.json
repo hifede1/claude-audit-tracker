@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "proyecto": "claude-audit-tracker",
-  "last_audit": "2026-07-27 (plano firmado PR #38: FICHA/VISION/ALCANCE/PLAN + 9 ADRs; S07-S10 abiertas; fuente única de decisiones)",
+  "last_audit": "2026-07-27 (2) (bookkeeping S08: 3 encargos mergeados + PRIMER VETO REAL del loop — S06 destrabada; 2 de 3 ramas sin cerrar)",
   "closed_count": 10,
   "calibracion": {
     "unidad": "sesiones (~2-4h)",
@@ -83,7 +83,7 @@
     },
     {
       "sesion": "S06",
-      "titulo": "Aprendizaje post-mortem (v2.0) — EN PAUSA: espera el primer veto real",
+      "titulo": "Aprendizaje post-mortem (v2.0) — DESTRABADA el 2026-07-27: el veto del PR #44 es el caso real que su criterio 3 esperaba desde el 2026-07-13",
       "estimacion": 1,
       "deps": [],
       "cierra": [
@@ -99,7 +99,7 @@
     },
     {
       "sesion": "S08",
-      "titulo": "Provocar las ramas difíciles del loop (cambios pedidos · veto · silencio 72h) — DESTRABA S06",
+      "titulo": "Provocar las ramas difíciles del loop — 1 de 3 cerrada (2026-07-27): veto ✅ · cambios pedidos ⚠️ a medias · silencio ❌ invalidado",
       "estimacion": 2,
       "deps": [],
       "cierra": []
@@ -133,9 +133,8 @@
     {
       "tema": "claude-code-plugins",
       "path": "docs/references/claude-code-plugins.md",
-      "frescura": "refresco",
-      "fecha": "2026-07-16",
-      "motivo_refresco": "no contiene el gotcha de duplicate-hooks que rompió la v1.11.0, descubierto 5 días después de escribirla"
+      "frescura": "fresca",
+      "fecha": "2026-07-27"
     },
     {
       "tema": "ponytail",
@@ -148,7 +147,7 @@
       "path": "docs/references/doc-arquitecto.md",
       "frescura": "refresco",
       "fecha": "2026-07-18",
-      "motivo_refresco": "cita la FICHA de claude-doc-arquitecto como «contrato de diseño firmado», y esa ficha NO lleva la línea de firma de 011"
+      "motivo_refresco": "cita la FICHA de claude-doc-arquitecto como «contrato de diseño firmado» y esa ficha NO lleva la línea de ratificación de 011. Su corrección se fue con el PR #44, VETADO: el encargo #41 quedó liberado y no se re-toma sin re-priorización."
     }
   ],
   "referencias_faltantes": [
@@ -168,9 +167,10 @@
     }
   ],
   "deuda": [
-    "Ramas difíciles del loop sin ejercitar (cambios pedidos, veto, silencio prolongado) — provocarlas a propósito. La toma S08, y su veto DESTRABA el criterio 3 de S06.",
+    "Ramas difíciles del loop: PARCIALMENTE ejercitadas el 2026-07-27 (S08). ✅ VETO cerrado (PR #44 cerrado sin merge → encargo #41 liberado y no re-tomado; DESTRABÓ el criterio 3 de S06). ⚠️ CAMBIOS PEDIDOS a medias: ronda 1 completa, escalado tras 2 rondas sin probar (el PR #46 se mergeó antes de la ronda 2). ❌ SILENCIO invalidado: el criterio pide 72h y el PR #45 se mergeó a las 2h37m del T0.",
     "Sin telemetría del loop (rondas por encargo, escaladas, costo): decidir si vale la pena. La toma S10 — gated-por-FIRMA, no por ejecución.",
     "/proximo-encargo especificado desde v1.1 y JAMÁS ejercitado: ninguna máquina tomó nunca un encargo. La toma S07.",
-    "La emisión automática del estado.json no se ejercitó end-to-end: batuta lo consumió el 2026-07-26 pero su corrida frenó antes, por precondición de plano (levantada por el PR #38). La toma S09."
+    "La emisión automática del estado.json no se ejercitó end-to-end: batuta lo consumió el 2026-07-26 pero su corrida frenó antes, por precondición de plano (levantada por el PR #38). La toma S09.",
+    "Hallazgo abierto sobre docs/references/claude-code-plugins.md (ronda 2 del PR #46, llegada después del merge): la regla «no declares hooks en el manifiesto» no declara su excepción para rutas no estándar, y no consta contra qué VERSIÓN de Claude Code se verificó el comportamiento de auto-carga."
   ]
 }
