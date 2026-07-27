@@ -51,6 +51,34 @@ La cola de validación vive en GitHub, no en ticks del tracker: el equivalente d
 
 Los hooks necesitan `node` en el PATH y siguen el contrato *never-block*: sin snapshot no emiten nada, y un hook roto jamás frena la sesión.
 
+## El plano de este repo
+
+Esta herramienta audita código contra un plano — y durante meses **fue el único proyecto propio
+del taller que no tenía el suyo**. Desde el 2026-07-26 lo tiene, firmado:
+
+| Documento | Qué contiene |
+|---|---|
+| [`docs/FICHA.md`](docs/FICHA.md) | El doc raíz: propósito, superficie, garantías, arquitectura y criterios de aceptación |
+| [`docs/VISION.md`](docs/VISION.md) | El problema real (el drift), para quién, y cómo se ve el éxito de forma observable |
+| [`docs/ALCANCE.md`](docs/ALCANCE.md) | Qué hace la v1 y qué **no** — cada descarte con su porqué — más la deuda declarada |
+| [`docs/PLAN.md`](docs/PLAN.md) | Historial v1.0→v1.12 y las sesiones abiertas, cada una con **qué la retiene** |
+| [`docs/decisiones/`](docs/decisiones/) | Los ADRs: contexto, opciones con tradeoffs, decisión, porqué y **costo aceptado** |
+| [`docs/references/`](docs/references/) | Investigación destilada, con su [catálogo](docs/references/README.md) |
+| [`docs/estado-contrato.md`](docs/estado-contrato.md) | El contrato del artefacto que otras máquinas consumen |
+
+**Los porqués mandan desde [`docs/decisiones/`](docs/decisiones/):** esa carpeta es la única
+fuente de las decisiones del proyecto, y el registro ⚖️ del tracker la refleja sin duplicarla —
+cada ADR anota qué entrada previa del tracker absorbió, así el mapeo no se pierde. El detalle
+está en la [ficha](docs/FICHA.md) §10.
+
+Y si buscás por qué algo es como es, empezá ahí y no por el CHANGELOG: ahí están las entregas,
+no las razones.
+
+> Esa regla se escribió a golpes: el 2026-07-26 se creó `docs/decisiones/` sin advertir que el
+> tracker ya mantenía su propio registro desde julio, y quedaron **dos fuentes del mismo dato** —
+> el drift exacto que este producto existe para detectar, dentro del producto mismo. La
+> re-auditoría del día siguiente lo encontró y declaró la fuente única.
+
 ## Instalación
 
 Dentro de Claude Code:
