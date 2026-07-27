@@ -7,7 +7,7 @@ Esta tabla es lo que la pestaña 📚 Referencias del tracker consume **sin trad
 **Frescura** — evaluación de **vigencia**, no de existencia: 🟢 fresca · 🟠 pendiente de
 refresco · 🔴 faltante. *«Existe» no es un estado de frescura.*
 
-Actualizado: 2026-07-26.
+Actualizado: 2026-07-27.
 
 | Tema | Qué resuelve | Fecha | Triggers | Quién la usa | Frescura |
 |---|---|---|---|---|---|
@@ -27,9 +27,11 @@ Actualizado: 2026-07-26.
 | Ponytail | `docs/references/ponytail.md` |
 | El taller `fede-tools` | `docs/business/taller-fede-tools.md` |
 
-## Por qué una referencia está en 🟠
+## Movimientos de frescura
 
-La frescura evalúa vigencia, y este drift está **verificado**, no sospechado:
+La frescura evalúa **vigencia**, y todo drift listado acá está **verificado**, no sospechado.
+Las resueltas se conservan con su fecha: saber qué se corrigió y cuándo es tan útil como saber
+qué falta.
 
 ### ✅ Resuelto el 2026-07-27 — Plugins de Claude Code
 

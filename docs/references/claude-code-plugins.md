@@ -72,28 +72,20 @@ Verificación: `/plugin list` (o menú `/plugin` → Installed / Errors).
    **Verificado el 2026-07-18** en instalación limpia con config aislada (`CLAUDE_CONFIG_DIR`).
    Fix: quitar la referencia del manifiesto — los hooks se auto-cargan igual
    ([PR #27](https://github.com/hifede1/claude-audit-tracker/pull/27), v1.11.1).
-   **Por qué nadie lo vio antes:** la v1.11.0 se publicó sin hacer un install end-to-end real.
-   El CI validaba los JSON y la estructura, pero **ningún gate instala el plugin** — y este fallo
-   solo aparece al instalar. *Un artefacto que no se instala nunca, no está verificado: está
-   declarado.*
+   **Por qué nadie lo vio antes:** ver §Estado de verificación — este fallo solo aparece al
+   instalar, y nada en el pipeline instalaba.
 
 ## Estado de verificación
 
 **Instalación end-to-end: VERIFICADA el 2026-07-18** (encargo S04, issue #7), en config aislada
 con `CLAUDE_CONFIG_DIR` → `Status: ✔ enabled`.
 
-Esa corrida **encontró un fallo que ningún gate del CI podía ver** (gotcha 7: doble carga de
-hooks) y produjo el fix de la v1.11.1. Sus fricciones se incorporaron acá y al §Troubleshooting
-del README.
+Esa corrida produjo el fix de la v1.11.1, y sus fricciones se incorporaron acá y al
+§Troubleshooting del README.
 
-> **La lección de S04, que vale más que el gotcha:** la v1.11.0 se publicó con el plugin roto
-> y nadie lo notó, porque **el CI validaba los JSON y la estructura pero ningún gate instalaba
-> el plugin**. El pendiente que lo habría atrapado (`p-install`) existía y llevaba semanas
-> abierto. *Un artefacto que no se instala nunca no está verificado: está declarado.*
-
-**Refresco de esta referencia:** 2026-07-27 (encargo
-[#40](https://github.com/hifede1/claude-audit-tracker/issues/40)). Se incorporó el gotcha 7, se
-corrigió esta sección —que seguía afirmando que la instalación estaba sin verificar, nueve días
-después de verificarse— y se sumaron los triggers `hooks`, `manifiesto`, `plugin.json` y `carga`:
-sin ellos, un encargo sobre hooks **no cargaba esta referencia**, que es justo donde vive la
-trampa que rompió la v1.11.0.
+> **La lección, que vale más que el gotcha:** la v1.11.0 se publicó con el plugin roto y nadie
+> lo notó, porque **el pipeline validaba los JSON y la estructura pero nada instalaba el
+> plugin** — y el fallo solo aparece al instalar. El pendiente que lo habría atrapado
+> (`p-install`) existía y llevaba semanas abierto.
+>
+> *Un artefacto que no se instala nunca no está verificado: está declarado.*
