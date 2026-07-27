@@ -20,8 +20,32 @@ Contexto adicional del usuario (si lo hay: límite de iteraciones, sesión concr
 6. **Pedí la firma.** Abrí el PR (`Closes #NN`), pegá el informe de verificación como comentario y activá el canal de firma definido en las precondiciones. **Umbral de riesgo**: si la calibración define clases de encargo auto-mergeables, un encargo de esa clase con CI verde + informe de dos actores limpio se mergea SIN esperar firma, DECLARÁNDOLO en el PR («automerge por umbral de calibración: clase docs») — pero la clasificación en zona gris jamás la decidís vos: duda = se firma. Default sin calibración explícita: TODO se firma. **Esperá el CI del PR**: si falla, reparalo en la misma rama y re-corré el paso 5 — con CI rojo no se pide firma, y un CI rojo no cuenta como ronda de review (es tuyo, no del validador).
 7. **Reaccioná a la señal del validador.**
    - **Firmado** (review aprobado o `✅ validado`) → con CI verde, mergeá. Si entre la firma y el merge el CI se puso rojo o entraron cambios nuevos, reparalo, re-verificá y avisale al validador que su firma quedó desactualizada — jamás mergees con CI rojo. Tras el merge, cerrá el ciclo del tracker (ver «Cierre del tracker»).
-   - **Cambios pedidos** → cada comentario es un hallazgo: aplicalo en la misma rama, re-corré el paso 5, actualizá el informe y volvé a pedir firma. Tras **2 rondas rechazadas del mismo encargo**, escalá ESE encargo — el loop sigue con los demás: comentá en el issue el diagnóstico y qué decisión falta, marcá el PR como draft y sacalo del cupo de 3. Un encargo escalado espera una DECISIÓN humana, no una firma: mantené tu 🔒 (liberarlo estaría mal — le falta una decisión, no un ejecutor); un comentario posterior del validador en el issue/PR lo reactiva.
-   - **Vetado** (el validador cerró el PR sin mergear) → no es una ronda: es un veto. Comentá en el issue qué pasó, liberá el reclamo (`🔓 Liberado por orquestador: PR #NN cerrado por el validador`) y NO re-tomes ese encargo hasta que un humano lo re-priorice explícitamente.
+   - **Cambios pedidos** → cada comentario es un hallazgo: aplicalo en la misma rama, re-corré el paso 5, actualizá el informe y volvé a pedir firma. Tras **2 rondas rechazadas del mismo encargo**, escalá ESE encargo — el loop sigue con los demás: comentá en el issue el diagnóstico y qué decisión falta, marcá el PR como draft y sacalo del cupo de 3. Un encargo escalado espera una DECISIÓN humana, no una firma: mantené tu 🔒 (liberarlo estaría mal — le falta una decisión, no un ejecutor); un comentario posterior del validador en el issue/PR lo reactiva. **Cuando se resuelve, destilá su lección** (ver «Post-mortem» abajo): una escalada resuelta es de los episodios que más conocimiento dejan — hubo desacuerdo, y quedó dirimido.
+   - **Vetado** (el validador cerró el PR sin mergear) → no es una ronda: es un veto. Comentá en el issue qué pasó, liberá el reclamo (`🔓 Liberado por orquestador: PR #NN cerrado por el validador`) y NO re-tomes ese encargo hasta que un humano lo re-priorice explícitamente. **Y destilá la lección (ver abajo).**
+
+### Post-mortem: un veto o una escalada resuelta DESTILA su lección
+
+Un error que ya obligó al humano a corregirlo una vez no debe volver a aparecer. Hoy esa lección
+muere en los comentarios del PR — y los comentarios no se leen dos veces.
+
+**Cuándo se dispara:** tras un **veto**, o tras una **escalada resuelta** (el encargo que pasó a
+draft y el validador destrabó con su decisión). No en cada ronda de cambios: en el cierre del
+episodio.
+
+**Dónde va la lección** — la más específica que aplique:
+- a la **referencia del tema** en `docs/references/`, si es conocimiento reusable (una trampa de
+  la herramienta, un patrón que falla, un método de verificación que engaña);
+- al **🛠️ método de la ficha** del bloque, si solo aplica a ese bloque;
+- si el tema no tiene referencia, **se crea** con sus `triggers` — sin ellos, el conocimiento no
+  encuentra al encargo siguiente (`decisiones/009`).
+
+**Qué lleva, sin excepción:** la lección en una línea accionable · su **fecha** · el **link al PR
+o issue que la originó**. Sin link no es lección: es una opinión fechada.
+
+**Qué NO se destila.** Si el episodio no dejó conocimiento —un veto por re-priorización, o uno
+provocado a propósito para ejercitar el loop— **se dice que no lo dejó**. Inventarle una lección
+llena la referencia de ruido y entrena a saltearla, que es el modo exacto en que un sistema de
+conocimiento muere. **Registrar «este veto no destiló lección, y por qué» ES cumplir la regla.**
    - **Silencio** → NO es firma. Si podés suscribirte a la actividad del PR, suscribite y seguí con otro encargo; si no, dejá el estado claro y reconciliá al reanudar (paso 1). Jamás interpretes el silencio como firma.
 8. **Iterá.** Mientras queden encargos desbloqueados (y no hayas alcanzado el límite de $ARGUMENTS): mientras un PR espera firma podés arrancar el siguiente encargo INDEPENDIENTE (que no dependa de nada sin mergear), hasta un máximo de **3 PRs esperando firma** — más que eso inunda al validador y el loop se degrada (los escalados y vetados no cuentan: no esperan firma). Sin encargos ejecutables → reportá: qué espera firma (links), qué quedó escalado o bloqueado y por qué, y qué firmas destrabarían la cola.
 
