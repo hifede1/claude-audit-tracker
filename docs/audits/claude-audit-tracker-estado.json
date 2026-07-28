@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "proyecto": "claude-audit-tracker",
-  "last_audit": "2026-07-28 (2) (S07·A CERRADA — /proximo-encargo ejercitado por primera vez en 6 meses; el conocimiento destilado ayer llegó solo por trigger)",
+  "last_audit": "2026-07-28 (3) (S09 CERRADA — batuta consumió el estado.json end-to-end sin re-auditar: el circuito que 006 prometió, cerrado en el repo que lo pidió)",
   "closed_count": 11,
   "calibracion": {
     "unidad": "sesiones (~2-4h)",
@@ -90,13 +90,6 @@
       "cierra": []
     },
     {
-      "sesion": "S09",
-      "titulo": "Consumo end-to-end del estado.json por un tercero (batuta)",
-      "estimacion": 1,
-      "deps": [],
-      "cierra": []
-    },
-    {
       "sesion": "S10",
       "titulo": "Decidir la telemetría del loop",
       "estimacion": 1,
@@ -159,7 +152,6 @@
   "deuda": [
     "Ramas difíciles del loop: PARCIALMENTE ejercitadas el 2026-07-27 (S08). ✅ VETO cerrado (PR #44 cerrado sin merge → encargo #41 liberado y no re-tomado; DESTRABÓ el criterio 3 de S06). ⚠️ CAMBIOS PEDIDOS a medias: ronda 1 completa, escalado tras 2 rondas sin probar (el PR #46 se mergeó antes de la ronda 2). ❌ SILENCIO invalidado: el criterio pide 72h y el PR #45 se mergeó a las 2h37m del T0.",
     "Sin telemetría del loop (rondas por encargo, escaladas, costo): decidir si vale la pena. La toma S10 — gated-por-FIRMA, no por ejecución.",
-    "La emisión automática del estado.json no se ejercitó end-to-end: batuta lo consumió el 2026-07-26 pero su corrida frenó antes, por precondición de plano (levantada por el PR #38). La toma S09.",
     "Hallazgo abierto sobre docs/references/claude-code-plugins.md (ronda 2 del PR #46, llegada después del merge): la regla «no declares hooks en el manifiesto» no declara su excepción para rutas no estándar, y no consta contra qué VERSIÓN de Claude Code se verificó el comportamiento de auto-carga.",
     "S07·A CERRADA el 2026-07-28: /proximo-encargo ejercitado en corrida real por primera vez en 6 meses (encargo #41 → PR #54). Queda S07·B — el CRUCE de reclamos con el orquestador — gated por una SEGUNDA IDENTIDAD que 027 retiró y 028 declaró ausente: ni trabajo, ni firma, ni tiempo lo destraban. Y el criterio «no toma un encargo liberado por veto» quedó SIN CASO al re-priorizarse el único vetado: espera el próximo veto real."
   ]
