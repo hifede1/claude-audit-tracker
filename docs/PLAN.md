@@ -88,15 +88,39 @@ capacidad — la lección de S04 (el install que nadie había hecho) aplica igua
 `/proximo-encargo`, verificar el reclamo por comentario, la rama y el PR con `Closes #NN`.
 
 ✅ **Criterios de aceptación.**
-- [ ] Un encargo real reclamado por `/proximo-encargo` *(verificación: comentario de reclamo en el issue, autoría de la máquina)*
+
+**Parte A — el MECANISMO** (ejercitable con un solo actor):
+- [ ] Un encargo real reclamado por `/proximo-encargo` *(verificación: el comentario de reclamo existe en el issue, con su fecha)*
 - [ ] Rama y PR abiertos por esa corrida, con `Closes #NN` *(verificación: el PR referencia el issue y lo cierra al mergear)*
 - [ ] Las dependencias se respetaron: no tomó un encargo bloqueado *(verificación: inspección del orden contra el plan)*
+- [ ] **No tomó un encargo liberado por veto sin re-priorización** *(verificación: los vetados siguen sin reclamo tras la corrida)*
+
+**Parte B — el CRUCE de reclamos** ⛓️ **gated por una SEGUNDA IDENTIDAD**:
+- [ ] Un intento de tomar un encargo ya reclamado por el orquestador → lo saltea *(verificación: dos actores con cuentas distintas, y el reclamo ajeno respetado)*
+
+> ### ⚠️ Corrección de criterio (2026-07-28)
+>
+> Esta sesión nació pidiendo *«autoría de la máquina»* en el reclamo, y su valor real es el
+> **cruce de reclamos** con el orquestador. **Las dos cosas exigen una segunda identidad de
+> GitHub** — y `decisiones/027` la revirtió, `028` declaró el agujero. S07 se escribió antes de
+> eso y quedó apoyada en un supuesto que el taller **ya no cumple**.
+>
+> Con una sola cuenta: la autoría del reclamo **no discrimina** quién lo puso, y no hay cruce que
+> verificar — sería comprobar que un actor no se pisa a sí mismo.
+>
+> **Se parte en dos** en vez de declararla incumplible: el **mecanismo** se ejercita hoy con un
+> actor y **prueba lo que la spec nunca probó en 6 meses**; el **cruce** espera una segunda
+> identidad, que es una decisión abierta del taller (`028` la dejó reversible sin costo).
+>
+> Se agrega además un criterio que ayer no existía: **que no tome un encargo liberado por veto**.
+> Salió de S08 — el `#41` está en esa condición ahora mismo, así que la cola tiene el caso listo.
 
 📚 **Referencias.** `docs/references/claude-code-plugins.md`
 
-⛓️ **Prerrequisitos.** Ninguno.
+⛓️ **Prerrequisitos.** Parte A: ninguno. **Parte B: una segunda identidad de GitHub** — no la
+destraba trabajo ni una firma sobre este repo, sino una decisión del taller sobre `028`.
 
-**Estimación: S**
+**Estimación: S** (parte A) **+ bloqueada** (parte B)
 
 ---
 
@@ -202,20 +226,28 @@ como evidencia; ninguna cantidad de código la destraba.
 |---|---|---|---|
 | S04 | Instalación verificada + hooks reales | S | ✅ cerrada (v1.11.1) |
 | **S06** | Aprendizaje post-mortem | S | ⏸️ **EVENTO** — la destraba S08 |
-| **S07** | Ejercitar `/proximo-encargo` | S | — |
+| **S07** | Ejercitar `/proximo-encargo` | S | **A:** — · **B:** una SEGUNDA IDENTIDAD *(la retiró `027`)* |
 | **S08** | Provocar las ramas difíciles del loop | M | **ACTO DEL VALIDADOR** + 72h de reloj *(la preparación ya está: #40 · #41 · #42)* |
 | **S09** | Consumo end-to-end del `estado.json` | S | plano firmado ✅ (esta corrida) |
 | **S10** | Decidir telemetría | S | **FIRMA** + evidencia de S07/S08 |
 
-**Cuatro compuertas distintas, declaradas** *(corregido el 2026-07-27)*: **S07** espera
-**ejecución** · **S06** espera un **evento** (que S08 produce) · **S10** espera una **firma** ·
-**S08** espera **dos actos del validador y 72h de reloj** — su preparación ya está hecha.
+**Cinco compuertas distintas, declaradas** *(actualizado el 2026-07-28)*:
+**S07·A** espera **ejecución** · **S06** esperaba un **evento** (S08 lo produjo → cerrada) ·
+**S10** espera una **firma** · **S08** espera **dos actos del validador y 72h de reloj** ·
+**S07·B** espera una **IDENTIDAD** — algo que ni el trabajo, ni una firma, ni el tiempo destraban.
 
 Confundirlas es lo que deja un proyecto esperando meses por «que alguien lo haga» cuando en
 realidad esperaba otra cosa.
 
-> **Y este plan ya se equivocó una vez, en su primera semana de vida.** S08 nació clasificada
-> como ejecución y no lo era: nadie la habría destrabado trabajando. Lo detectó la fase
-> `planificar` de `batuta` al enumerar criterio por criterio — no la intuición de nadie. La
-> lección no es que el plan estaba mal; es que **la clasificación hay que derivarla de los
-> criterios, no asignarla al escribir la ficha.**
+> **Este plan ya se equivocó dos veces en su primera semana de vida.**
+>
+> **S08** nació clasificada como ejecución y no lo era: nadie la habría destrabado trabajando.
+>
+> **S07** nació pidiendo «autoría de la máquina» y un cruce de reclamos — **las dos cosas
+> necesitan una segunda identidad de GitHub, que `027` revirtió y `028` declaró ausente**. La
+> sesión quedó apoyada en un supuesto que el taller dejó de cumplir, y nadie lo notó hasta que
+> se fue a ejecutar.
+>
+> Las dos las detectó **enumerar criterio por criterio antes de trabajar** — no la intuición de
+> nadie. La lección: **la clasificación se deriva de los criterios, y los criterios se revisan
+> contra lo que el taller es HOY, no contra lo que era cuando se escribieron.**
