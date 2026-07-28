@@ -117,8 +117,36 @@ if (fs.existsSync(auditsDir)) {
   }
 }
 
+// --- versión del plugin ↔ encabezado del tracker -----------------------------
+// Por qué existe: el 2026-07-27 el encabezado decía v1.8.0 con el plugin en
+// v1.12.0 — cuatro versiones de atraso, en la primera línea que ve cualquiera,
+// desde julio. Ningún gate lo miraba, y lo que ningún gate mira driftea en
+// silencio (misma lección que el gotcha de duplicate-hooks y que decisiones/011).
+//
+// El ámbito se acota AL ENCABEZADO a propósito: la versión aparece también en el
+// CHANGELOG embebido del tracker, así que buscarla suelta en el archivo daría
+// falsos positivos. Ver docs/references/verificacion-de-criterios.md.
+if (fs.existsSync(auditsDir)) {
+  for (const file of fs.readdirSync(auditsDir)) {
+    if (!file.endsWith('-tracker.html')) continue;
+    const rel = path.join('docs/audits', file);
+    const header = read(rel).match(/<header class="top">([\s\S]*?)<\/header>/);
+    if (!header) {
+      errors.push(rel + ': no encontré <header class="top"> para cotejar la versión del plugin');
+      continue;
+    }
+    // espacios normalizados: el HTML corta líneas y la versión puede quedar partida
+    if (!header[1].replace(/\s+/g, ' ').includes('v' + plugin.version)) {
+      errors.push(
+        rel + ': el encabezado no menciona la versión del plugin — plugin.json declara v' +
+        plugin.version + '. Un tracker que anuncia una versión vieja miente en su primera línea.',
+      );
+    }
+  }
+}
+
 if (errors.length) {
   console.error('DRIFT detectado:\n- ' + errors.join('\n- '));
   process.exit(1);
 }
-console.log('consistencia OK (marketplace↔plugin, versión↔CHANGELOG, hooks↔archivos, estado.json↔tracker)');
+console.log('consistencia OK (marketplace↔plugin, versión↔CHANGELOG, hooks↔archivos, estado.json↔tracker, versión↔encabezado)');
