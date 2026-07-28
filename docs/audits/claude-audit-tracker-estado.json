@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "proyecto": "claude-audit-tracker",
-  "last_audit": "2026-07-28 (3) (S09 CERRADA — batuta consumió el estado.json end-to-end sin re-auditar: el circuito que 006 prometió, cerrado en el repo que lo pidió)",
+  "last_audit": "2026-07-28 (4) (v1.14.0 — la asignación pasa a condición de publicación: /proximo-encargo era ciego a 3 de los 5 encargos que este repo publicó)",
   "closed_count": 11,
   "calibracion": {
     "unidad": "sesiones (~2-4h)",
@@ -15,7 +15,7 @@
       "nombre": "/audit-tracker",
       "zona": "Comandos — el producto",
       "estado": "hecho",
-      "resumen": "Spec completa (3 fases, calibración de 5 ítems, tracker de 7 pestañas) y ejercitada de punta a punta en proyecto externo (nuecesmecohue 2026-07-14). Riesgo restante: mantenimiento, no diseño.",
+      "resumen": "Spec completa (3 fases, calibración de 5 ítems, tracker de 7 pestañas) y ejercitada de punta a punta en proyecto externo (nuecesmecohue 2026-07-14). Riesgo restante: mantenimiento, no diseño. v1.14.0: la re-auditoría verifica además la COLA de despacho — encargo abierto sin assignee ni label maquina/* es drift, y el despachador lo repara en el acto.",
       "pendientes": []
     },
     {
@@ -23,7 +23,7 @@
       "nombre": "/proximo-encargo",
       "zona": "Comandos — el producto",
       "estado": "curso",
-      "resumen": "Spec estable desde v1.1. Falta corrida real: ninguna máquina tomó jamás un encargo; se prueba en cuanto exista cola.",
+      "resumen": "Spec estable desde v1.1 y EJERCITADA en corrida real: S07·A el 2026-07-28 (encargo #41 → PR #54), primera en 6 meses. La SEGUNDA corrida (#59 → PR #60, v1.14.0) destapó que el comando era CIEGO a 3 de los 5 encargos publicados en la historia del repo: buscaba solo por --assignee @me y esos issues nunca lo tuvieron — la corrida anterior funcionó por azar. Causa raíz: una costura, no un bug — /audit-tracker manda asignar, /orquestar reclama por comentario y nunca asigna, y los dos leen la misma cola por campos distintos. Corregido de los dos lados. Falta S07·B: el CRUCE de reclamos, gated por una segunda identidad de GitHub.",
       "pendientes": []
     },
     {
@@ -31,7 +31,7 @@
       "nombre": "/orquestar",
       "zona": "Comandos — el producto",
       "estado": "curso",
-      "resumen": "Spec completa y endurecida: 5 corridas verificadas, verificación en dos actores (v1.9), presupuesto por encargo (v1.10), snapshot local (v1.11). Falta: ramas difíciles (cambios pedidos, veto, silencio) y el post-mortem (S06). v1.13.0 (S06): el loop DESTILA la lección de cada veto o escalada resuelta a docs/references/ con fecha y link al PR de origen, y la re-auditoría lo verifica — episodio sin lección = pendiente nuevo. Si el episodio no dejó conocimiento, se declara: la ausencia declarada cumple la regla, el silencio no.",
+      "resumen": "Spec completa y endurecida: 5 corridas verificadas, verificación en dos actores (v1.9), presupuesto por encargo (v1.10), snapshot local (v1.11). v1.13.0 (S06, CERRADA): el loop DESTILA la lección de cada veto o escalada resuelta a docs/references/ con fecha y link al PR de origen, y la re-auditoría lo verifica — episodio sin lección = pendiente nuevo; si el episodio no dejó conocimiento, se declara, y la ausencia declarada cumple la regla. Falta cerrar las ramas difíciles (S08): veto ✅, cambios pedidos ⚠️ a medias (escalado sin probar), silencio ❌ invalidado dos veces.",
       "pendientes": []
     },
     {
@@ -53,7 +53,7 @@
       "nombre": "Gates / CI del repo",
       "zona": "Calidad",
       "estado": "hecho",
-      "resumen": "validate.yml con 5 gates (parseo de JSONs, estructura de comandos, node --check de tracker y hooks, check-consistency). Test negativo verificado.",
+      "resumen": "validate.yml con 5 gates (parseo de JSONs, estructura de comandos, node --check de tracker y hooks, check-consistency). Test negativo verificado. check-consistency creció a CINCO chequeos internos: marketplace↔plugin, versión↔CHANGELOG, hooks↔archivos, estado.json↔tracker y —desde v1.13.0 (PR #58)— versión del plugin↔encabezado del tracker, que encontró un drift real de menos de 24h en su primera corrida. HALLAZGO ABIERTO: ese gate coteja SOLO la versión, y el encabezado declara también la fecha de firma del plano, que estaba driftada y pasó en verde.",
       "pendientes": []
     },
     {
@@ -61,7 +61,7 @@
       "nombre": "README + CHANGELOG + referencias propias",
       "zona": "Conocimiento",
       "estado": "hecho",
-      "resumen": "README sincronizado. CHANGELOG.md v1.0→v1.12.0. docs/references/ con 4 referencias (frontmatter triggers/fuentes/fecha) más su catálogo README.md. 2026-07-26/27 (PR #38): el repo ganó su propio plano — era el único de los 7 propios sin él. FICHA.md con la línea de firma de 011, VISION, ALCANCE, PLAN y docs/decisiones/ con 9 ADRs, declarada FUENTE ÚNICA de decisiones (el registro del tracker linkea y cura, no duplica).",
+      "resumen": "README sincronizado. CHANGELOG.md v1.0→v1.14.0. docs/references/ con 5 referencias (frontmatter triggers/fuentes/fecha) más su catálogo README.md. 2026-07-26/27 (PR #38): el repo ganó su propio plano — era el único de los 7 propios sin él. FICHA.md con la línea de firma de 011, VISION, ALCANCE, PLAN y docs/decisiones/ con 11 ADRs, declarada FUENTE ÚNICA de decisiones (el registro del tracker linkea y cura, no duplica). verificacion-de-criterios ampliada el 2026-07-28 (PR #60): de una familia a tres.",
       "pendientes": []
     }
   ],
@@ -77,14 +77,14 @@
     },
     {
       "sesion": "S07",
-      "titulo": "Ejercitar /proximo-encargo en corrida real",
+      "titulo": "Ejercitar /proximo-encargo — Parte A CERRADA (2026-07-28, dos corridas reales) · Parte B gated por una SEGUNDA IDENTIDAD",
       "estimacion": 1,
       "deps": [],
       "cierra": []
     },
     {
       "sesion": "S08",
-      "titulo": "Provocar las ramas difíciles del loop — 1 de 3 cerrada (2026-07-27): veto ✅ · cambios pedidos ⚠️ a medias · silencio ❌ invalidado",
+      "titulo": "Provocar las ramas difíciles del loop — 1 de 3 cerrada: veto ✅ · cambios pedidos ⚠️ a medias · silencio ❌ invalidado DOS veces (2h37m y 10m48s de las 72h)",
       "estimacion": 2,
       "deps": [],
       "cierra": []
@@ -130,7 +130,7 @@
       "tema": "Verificación de criterios: cómo el chequeo mecánico engaña",
       "path": "docs/references/verificacion-de-criterios.md",
       "frescura": "fresca",
-      "fecha": "2026-07-27"
+      "fecha": "2026-07-28"
     }
   ],
   "referencias_faltantes": [
@@ -150,9 +150,11 @@
     }
   ],
   "deuda": [
-    "Ramas difíciles del loop: PARCIALMENTE ejercitadas el 2026-07-27 (S08). ✅ VETO cerrado (PR #44 cerrado sin merge → encargo #41 liberado y no re-tomado; DESTRABÓ el criterio 3 de S06). ⚠️ CAMBIOS PEDIDOS a medias: ronda 1 completa, escalado tras 2 rondas sin probar (el PR #46 se mergeó antes de la ronda 2). ❌ SILENCIO invalidado: el criterio pide 72h y el PR #45 se mergeó a las 2h37m del T0.",
+    "Ramas difíciles del loop: PARCIALMENTE ejercitadas (S08). ✅ VETO cerrado (PR #44 cerrado sin merge → encargo #41 liberado y no re-tomado; DESTRABÓ el criterio 3 de S06). ⚠️ CAMBIOS PEDIDOS a medias: ronda 1 completa, escalado tras 2 rondas sin probar (el PR #46 se mergeó antes de la ronda 2). ❌ SILENCIO invalidado DOS VECES: el PR #45 duró 2h37m (3,6% de las 72h) y el PR #58 duró 10m48s (0,25%) — quince veces peor, pese a llevar el aviso en el título, no ser draft y no recibir ni un comentario.",
+    "SILENCIO — hay que RE-DISEÑARLO, no repetirlo. El problema no es la fuerza del aviso: el aviso vive en el título del PR, o sea en el mismo lugar que el botón de merge, y quien mergea lo lee después de haber decidido. Es el único criterio que no lo destraba trabajo, ni una firma, ni el reloj: exige abstención sostenida durante 72h, y nada en el sistema la protege.",
+    "El encabezado del tracker se escribe A MANO y declara datos que viven en otros archivos (versión del plugin, fecha de firma del plano). Tres drifts sobre esa misma línea en 24h; el gate de v1.13.0 solo coteja la versión y dio verde con la fecha de firma driftada. Extender el gate campo por campo es jugar al topo — la pregunta previa es por qué el encabezado no se deriva de sus fuentes.",
     "Sin telemetría del loop (rondas por encargo, escaladas, costo): decidir si vale la pena. La toma S10 — gated-por-FIRMA, no por ejecución.",
     "Hallazgo abierto sobre docs/references/claude-code-plugins.md (ronda 2 del PR #46, llegada después del merge): la regla «no declares hooks en el manifiesto» no declara su excepción para rutas no estándar, y no consta contra qué VERSIÓN de Claude Code se verificó el comportamiento de auto-carga.",
-    "S07·A CERRADA el 2026-07-28: /proximo-encargo ejercitado en corrida real por primera vez en 6 meses (encargo #41 → PR #54). Queda S07·B — el CRUCE de reclamos con el orquestador — gated por una SEGUNDA IDENTIDAD que 027 retiró y 028 declaró ausente: ni trabajo, ni firma, ni tiempo lo destraban. Y el criterio «no toma un encargo liberado por veto» quedó SIN CASO al re-priorizarse el único vetado: espera el próximo veto real."
+    "S07·B abierta: el CRUCE de reclamos entre /proximo-encargo y el orquestador, gated por una SEGUNDA IDENTIDAD que 027 retiró y 028 declaró ausente — ni trabajo, ni firma, ni tiempo lo destraban. Y el criterio «no toma un encargo liberado por veto» quedó SIN CASO al re-priorizarse el único vetado: espera el próximo veto real."
   ]
 }
