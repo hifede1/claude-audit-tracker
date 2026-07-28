@@ -80,6 +80,8 @@ orquesta el ciclo entero sin reimplementar ninguno de los dos.
 | `007` | Degradación declarada, nunca bloqueo silencioso | ✅ aceptada · 2026-07-13→16 |
 | `008` | Excepción de bookkeeping: el PR del tracker se automergea | ✅ aceptada · 2026-07-13 |
 | `009` | Referencias con `triggers`: el conocimiento busca al encargo | ✅ aceptada · 2026-07-13 |
+| `010` | El post-mortem destila lecciones, y la ausencia de lección **se declara** | ✅ aceptada · 2026-07-27 |
+| `011` | Un cambio de comportamiento exige MINOR, aunque el CI no lo obligue | ✅ aceptada · 2026-07-27 |
 
 > **`docs/decisiones/` es LA fuente de decisiones de este proyecto** (decidido el 2026-07-27).
 > El tracker las **linkea y cura**, no las duplica. Cada ADR declara qué registro previo del
