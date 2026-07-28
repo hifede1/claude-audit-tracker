@@ -7,12 +7,12 @@ Esta tabla es lo que la pestaña 📚 Referencias del tracker consume **sin trad
 **Frescura** — evaluación de **vigencia**, no de existencia: 🟢 fresca · 🟠 pendiente de
 refresco · 🔴 faltante. *«Existe» no es un estado de frescura.*
 
-Actualizado: 2026-07-27.
+Actualizado: 2026-07-28.
 
 | Tema | Qué resuelve | Fecha | Triggers | Quién la usa | Frescura |
 |---|---|---|---|---|---|
 | **Anatomía, instalación y gotchas de plugins/marketplaces de Claude Code** | Cómo se estructura, distribuye e instala el plugin, y qué rompe en el camino | 2026-07-27 | `plugin`, `marketplace`, `instalación`, `comandos`, `namespace`, `reload`, `distribución`, `hooks`, `manifiesto`, `plugin.json`, `carga` | S07 · histórico: v1.11.x (distribución) | 🟢 |
-| **`doc-arquitecto` — la herramienta hermana que produce y audita el plano** | Qué consume `audit-tracker` como entrada y de dónde sale | 2026-07-18 | `doc-arquitecto`, `documentación`, `plano`, `documentar`, `auditar-docs`, `contrato`, `references`, `fede-tools` | `FICHA.md` §5 · histórico: v1.12.0 | 🟠 |
+| **`doc-arquitecto` — la herramienta hermana que produce y audita el plano** | Qué consume `audit-tracker` como entrada y de dónde sale | 2026-07-28 | `doc-arquitecto`, `documentación`, `plano`, `documentar`, `auditar-docs`, `contrato`, `references`, `fede-tools` | `FICHA.md` §5 · histórico: v1.12.0 | 🟢 |
 | **Patrones de agentes autónomos de OpenHands aplicables al modo orquestado** | De dónde salen el critic model, el freno anti-loop y la firma por riesgo | 2026-07-13 | `orquestador`, `critic`, `verificador`, `confirmation mode`, `microagents`, `stuck detection`, `firma por riesgo`, `presupuesto`, `loop autónomo` | S08 · histórico: v1.8.0, v1.9.0, v1.10.0 | 🟢 |
 | **Ponytail — arquitectura de un plugin multi-agente con hooks** | Qué patrones de hooks se adoptaron, y cuáles se descartaron con su porqué | 2026-07-16 | `hooks`, `statusline`, `lifecycle`, `snapshot`, `estado`, `never-block`, `ponytail`, `yagni`, `skills`, `subagentes`, `consistencia`, `CI` | histórico: v1.11.0 (hooks + CI) | 🟢 |
 | **El taller `fede-tools`** *(business)* | Para quién es el proyecto, su lugar en la flota y bajo qué restricciones se construye | 2026-07-26 | `taller`, `fede-tools`, `marketplace`, `flota`, `batuta`, `doc-arquitecto`, `publicador`, `verificador`, `cartera`, `licencia`, `colaboradores` | `FICHA.md` §5 · `VISION.md` §6 | 🟢 |
@@ -48,17 +48,22 @@ verificación», que **seguía afirmando que la instalación estaba sin verifica
 de verificarse**; y se sumaron los triggers `hooks`, `manifiesto`, `plugin.json` y `carga` —
 sin ellos, un encargo sobre hooks no cargaba la referencia donde vive la trampa.
 
-### 🟠 Sigue abierta — `doc-arquitecto`
+### ✅ Resuelto el 2026-07-28 — `doc-arquitecto`
 
-**Su corrección se fue con el PR [#44](https://github.com/hifede1/claude-audit-tracker/pull/44),
-vetado el 2026-07-27.** El encargo [#41](https://github.com/hifede1/claude-audit-tracker/issues/41)
-quedó liberado y no se re-toma sin re-priorización humana. El drift sigue vigente:
+Su bloque `fuentes` citaba `claude-doc-arquitecto/docs/FICHA.md` como **«contrato de diseño
+firmado»**, y esa ficha **no lleva la línea de ratificación de `011`**: tiene una *mención* de
+firma en prosa. Para el contrato del taller es **borrador**, y por eso `batuta` frena si se le
+pide construir sobre él.
 
-Su bloque `fuentes` cita
-   `claude-doc-arquitecto/docs/FICHA.md — contrato de diseño **firmado**`, y el 2026-07-26 se
-   verificó que **esa ficha NO lleva la línea de firma de `011`**: dice «(firmada por Fede el
-   2026-07-17)», que es una *mención* de firma, no la firma. Para el contrato del taller, esa
-   ficha es **borrador**. **Refresco: corregir la caracterización de la fuente.**
+**Corregido** en el encargo [#41](https://github.com/hifede1/claude-audit-tracker/issues/41), que
+llegó por un camino largo: su primera corrida terminó **vetada** (PR
+[#44](https://github.com/hifede1/claude-audit-tracker/pull/44), 2026-07-27) para ejercitar esa
+rama del loop; el validador lo **re-priorizó** el 2026-07-28 y lo tomó `/proximo-encargo` —
+**primera corrida real de ese comando en seis meses de spec**.
+
+El drift **se re-verificó el 2026-07-28** antes de corregir, en vez de confiar en la lectura de
+la corrida vetada: la ficha ajena sigue sin la línea. Un dato de dos días atrás no es evidencia
+de hoy.
 
 ## Faltantes
 
