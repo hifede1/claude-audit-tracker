@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "proyecto": "claude-audit-tracker",
-  "last_audit": "2026-07-27 (3) (S06 CERRADA — v1.13.0: el post-mortem destila lecciones y la re-auditoría lo verifica; primera lección en docs/references/)",
+  "last_audit": "2026-07-28 (ADR 010 y 011 asentados, PR #51; S07 revisada: su criterio pedía una segunda identidad que 028 retiró)",
   "closed_count": 11,
   "calibracion": {
     "unidad": "sesiones (~2-4h)",
@@ -162,6 +162,7 @@
     "Sin telemetría del loop (rondas por encargo, escaladas, costo): decidir si vale la pena. La toma S10 — gated-por-FIRMA, no por ejecución.",
     "/proximo-encargo especificado desde v1.1 y JAMÁS ejercitado: ninguna máquina tomó nunca un encargo. La toma S07.",
     "La emisión automática del estado.json no se ejercitó end-to-end: batuta lo consumió el 2026-07-26 pero su corrida frenó antes, por precondición de plano (levantada por el PR #38). La toma S09.",
-    "Hallazgo abierto sobre docs/references/claude-code-plugins.md (ronda 2 del PR #46, llegada después del merge): la regla «no declares hooks en el manifiesto» no declara su excepción para rutas no estándar, y no consta contra qué VERSIÓN de Claude Code se verificó el comportamiento de auto-carga."
+    "Hallazgo abierto sobre docs/references/claude-code-plugins.md (ronda 2 del PR #46, llegada después del merge): la regla «no declares hooks en el manifiesto» no declara su excepción para rutas no estándar, y no consta contra qué VERSIÓN de Claude Code se verificó el comportamiento de auto-carga.",
+    "S07 pedida sobre un supuesto que el taller ya no cumple: su criterio 1 exige «autoría de la máquina» y su valor real es el cruce de reclamos con el orquestador — ambos necesitan una SEGUNDA IDENTIDAD que decisiones/027 revirtió y 028 declaró ausente. El mecanismo (reclamo, dependencias, PR con Closes) SÍ es ejercitable con un actor; el cruce no."
   ]
 }
