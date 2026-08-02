@@ -27,7 +27,7 @@
         "path": "plugins/cartera",
         "ref": "main"
       },
-      "description": "Worklist priorizado de toda la flota: recorre TODOS los proyectos del roster y devuelve UNA lista de trabajo priorizada entre ellos, leyendo solo evidencia dura que ya existe (GitHub, trackers commiteados) — estrictamente read-only. Regla de honestidad: lo no confirmable con evidencia fresca sale como VENCIDO, jamás verde cacheado. /cartera-roster: el disco descubre, el humano confirma, el roster manda."
+      "description": "Vista de toda la flota: recorre TODOS tus proyectos y devuelve UN worklist priorizado entre ellos + panel HTML, estrictamente read-only. Lee la capa dura (GitHub issues/PRs, tracker commiteado, registries); lo que no puede confirmar con evidencia fresca lo marca 'evidencia VENCIDA', nunca un verde cacheado. /cartera-roster descubre proyectos por disco y los suma al roster canónico solo con tu confirmación."
     },
     {
       "name": "batuta",
@@ -37,7 +37,7 @@
         "path": "plugins/batuta",
         "ref": "main"
       },
-      "description": "Director de orquesta DELGADO: lleva un proyecto de objetivo a obra componiendo las herramientas del taller (doc-arquitecto + audit-tracker), sin reimplementar el trabajo de ninguna ni mover el loop sin firma. Cuatro fases (analizar · planificar · ejecutar-con-compuertas · cerrar), tres compuertas META (externos, EGRESO outward, workflow→cola), Compuerta Cero con firma autenticada por horizonte, y la cadena idea → plano → encargos → obra exhibida con todo desvío como hallazgo. Requiere plano VIGENTE firmado y estado.json de audit-tracker ≥1.12.0."
+      "description": "Director de orquesta DELGADO: lleva un proyecto de objetivo a obra componiendo las herramientas del taller, sin reimplementar el trabajo de ninguna ni mover el loop sin firma. Preserva la cadena idea → plano → encargos → obra y exhibe todo desvío como hallazgo."
     },
     {
       "name": "publicador",

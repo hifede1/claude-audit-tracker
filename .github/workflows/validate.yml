@@ -31,6 +31,12 @@ jobs:
           echo "hooks y scripts OK"
 
       - name: Consistencia (marketplace↔plugin, versión↔CHANGELOG, hooks↔archivos, estado.json↔tracker)
+        # GH_TOKEN no es opcional: sin él `gh` está instalado pero NO autenticado,
+        # el cotejo de las entradas git-subdir contra su fuente se OMITE, y el check
+        # pasa en verde sin haber verificado nada. Medido el 2026-08-02: las 5
+        # entradas salieron omitidas y el job dio success igual.
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node scripts/check-consistency.js
 
       - name: Sintaxis JS del tracker
