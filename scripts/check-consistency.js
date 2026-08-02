@@ -24,9 +24,13 @@ const plugin = JSON.parse(read(path.join(PLUGIN_DIR, '.claude-plugin/plugin.json
 
 // 1. marketplace ↔ plugins: recorre TODAS las entradas del catálogo.
 //    - source local (string "./..."): valida name + description contra su plugin.json local.
-//    - source externo (objeto git-subdir): no se puede leer el plugin.json remoto acá, así que
-//      solo se valida que el source esté bien formado (url/path presentes; ref/sha son opcionales).
-//    La description de entradas externas no se coteja contra su fuente en este CI (vive en otro repo).
+//    - source externo (objeto git-subdir): se valida que el source esté bien formado (url/path
+//      presentes; ref/sha opcionales) Y —si hay red y `gh` disponible— se COTEJA la description
+//      contra el plugin.json remoto. Medido el 2026-08-02: 2 de 5 entradas externas habían
+//      driftado (batuta y cartera), mientras `publicador` prometía «cero drift por construcción».
+//      Sin red el cotejo se OMITE con aviso explícito, nunca en silencio: un check que no corrió
+//      no es un check que pasó.
+const omitidos = [];
 const plugins = marketplace.plugins || [];
 if (!plugins.some((p) => p.name === plugin.name)) {
   errors.push('marketplace.json no lista un plugin llamado "' + plugin.name + '"');
@@ -56,6 +60,24 @@ for (const entry of plugins) {
       }
     } else {
       errors.push('entrada externa "' + entry.name + '": source.source no soportado por este check ("' + s.source + '"; esperado git-subdir)');
+    }
+    // Cotejo contra la fuente remota. Requiere red + `gh` autenticado.
+    if (s.source === 'git-subdir' && s.url && s.path) {
+      const repo = s.url.replace('https://github.com/', '').replace(/\.git$/, '');
+      const ruta = repo + '/' + s.path + '/.claude-plugin/plugin.json';
+      let remoto = null;
+      try {
+        const out = require('child_process').execSync(
+          'gh api repos/' + repo + '/contents/' + s.path + '/.claude-plugin/plugin.json --jq .content',
+          { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+        remoto = JSON.parse(Buffer.from(out.trim(), 'base64').toString('utf8'));
+      } catch (e) {
+        omitidos.push(entry.name);
+      }
+      if (remoto && (remoto.description || '').trim() !== (entry.description || '').trim()) {
+        errors.push('entrada externa "' + entry.name + '": description driftada contra su fuente ('
+          + ruta + ') — el plugin.json manda (decidido en hifede1/claude-batuta#98)');
+      }
     }
   } else {
     errors.push('entrada "' + entry.name + '": source ausente o de tipo no soportado');
@@ -148,5 +170,9 @@ if (fs.existsSync(auditsDir)) {
 if (errors.length) {
   console.error('DRIFT detectado:\n- ' + errors.join('\n- '));
   process.exit(1);
+}
+if (omitidos.length) {
+  console.log('AVISO · cotejo contra la fuente OMITIDO (sin red o sin `gh`) para: ' + omitidos.join(', '));
+  console.log('        un check que no corrió no es un check que pasó.');
 }
 console.log('consistencia OK (marketplace↔plugin, versión↔CHANGELOG, hooks↔archivos, estado.json↔tracker, versión↔encabezado)');
